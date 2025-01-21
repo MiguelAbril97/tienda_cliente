@@ -1,0 +1,14 @@
+    <h1 class="display-3">Lista de Productos</h1>
+
+    <div class="row">
+        {% for producto in productos %}
+            <div class="col-sm-4 mb-2">
+                <p>ID: {{ producto.id }}</p>
+                <p>Nombre: {{ producto.nombre }}</p>
+                <p>Precio: {{ producto.precio }}</p>
+                <p>Descripción: {{ producto.descripcion }}</p>
+            </div>
+        {% empty %}
+            <h1>Lo sentimos, pero no hay productos</h1>
+        {% endfor %}
+    </div>
