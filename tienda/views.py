@@ -5,7 +5,7 @@ from django.core import serializers
 
 def productos_listar_api(request):
     #El :9090 es el puerto que he usado
-    headers = {'Authorization':'Bearer xRL3Yd0UHwlUR88EdlwkCocsqOZy23'}
+    headers = {'Authorization':'Bearer c7UXg0fpjPWxhC08caON41e0zlmphW'}
     response = requests.get('http://127.0.0.1:9090/api/v1/productos',headers=headers)
     productos = response.json
     return render(request, 'productos/lista.html',{'productos':productos})
