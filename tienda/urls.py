@@ -3,11 +3,11 @@ from .import views
 
     
 urlpatterns = [
-
-    path('productos/',views.productos_listar_api),
-    path('productos-mejorado/',views.productos_listar_mejorado_api),
-    path('calzados/',views.calzado_listar),
-    path('consolas/',views.consolas_listar),
+    path('',views.index),
+    path('productos/',views.productos_listar_api,name='lista_basica'),
+    path('productos-mejorado/',views.productos_listar_mejorado_api,name='lista_mejorada'),
+    path('calzados/',views.calzado_listar,name='calzados'),
+    path('consolas/',views.consolas_listar,name='consolas'),
     
     #CRUD calzado
     # path('calzado/crear', views.calzado_crear, name='calzado_crear'),

@@ -1,18 +1,12 @@
-{% extends "principal.html" %}
-
-{%block cabecera%}
-
-<h2>Enlaces</h2>
-{% endblock %}
-
-{%block contenido%}
+{% load django_bootstrap5 %}
+{% bootstrap_css %}
 <div class="container mt-5">
     <div class="row">
         <div class="col-md-3">
             <div class="card text-center">
                 <div class="card-body">
                     <h5 class="card-title">
-                        <a class="nav-link" href="{% url 'categoria_buscar' %}">Buscar categoría</a>
+                        <a class="nav-link" href="{% url 'lista_basica' %}">Lista basica</a>
                     </h5>
                 </div>
             </div>
@@ -21,7 +15,7 @@
             <div class="card text-center">
                 <div class="card-body">
                     <h5 class="card-title">
-                        <a class="nav-link" href="{% url 'producto_buscar' %}">Buscar producto</a>
+                        <a class="nav-link" href="{% url 'lista_mejorada' %}">Lista Mejorada</a>
                     </h5>
                 </div>
             </div>
@@ -30,50 +24,17 @@
             <div class="card text-center">
             <div class="card-body">
                 <h5 class="card-title">
-                <a class="nav-link" href="{% url 'producto_crear' %}">Crear producto</a>
+                <a class="nav-link" href="{% url 'calzados' %}">Calzados</a>
                 </h5>
             </div>
             </div>
         </div>
-        {% if request.user.rol == 1 %}
-        {% comment %}
-        <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <a class="nav-link" href="{% url 'calzado_buscar' %}">Buscar calzado</a>
-                    </h5>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <a class="nav-link" href="{% url 'mueble_buscar' %}">Buscar mueble</a>
-                    </h5>
-                </div>
-            </div>
-        </div>
-         <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <a class="nav-link" href="{% url 'consola_buscar' %}">Buscar consola</a>
-                    </h5>
-                </div>
-            </div>
-        </div>
-        {% endcomment %}
         <div class="col-md-3">
             <div class="card text-center">
             <div class="card-body">
                 <h5 class="card-title">
-                <a class="nav-link" href="{% url 'categoria_crear' %}">Crear categoría</a>
+                <a class="nav-link" href="{% url 'consolas' %}">Consolas</a>
                 </h5>
             </div>
             </div>
         </div>
-        {% endif %}
-    </div>
-{% endblock %}
