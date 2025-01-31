@@ -1,4 +1,6 @@
 # tienda_api
+client_id=aplicacion&client_secret=clave
+
 super usuario: 
     nombre de usuario: usuario
     contraseña: usuario
