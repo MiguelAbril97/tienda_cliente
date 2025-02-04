@@ -6,8 +6,14 @@ urlpatterns = [
     path('',views.index),
     path('productos/',views.productos_listar_api,name='lista_basica'),
     path('productos-mejorado/',views.productos_listar_mejorado_api,name='lista_mejorada'),
+    path('productos/buscar_simple/',views.producto_buscar_simple,name='productos_buscar_simple'),
+    path('productos/buscar_avanzada/',views.producto_buscar,name='productos_buscar'),
     path('calzados/',views.calzado_listar,name='calzados'),
+    path('calzados/buscar/',views.calzado_buscar,name='calzados_buscar'),
     path('consolas/',views.consolas_listar,name='consolas'),
+    path('consolas/buscar/',views.consola_buscar,name='consolas_buscar'),
+    path('muebles/',views.muebles_listar,name='muebles'),
+    path('muebles/buscar/',views.mueble_buscar,name='muebles_buscar'),
     
     #CRUD calzado
     # path('calzado/crear', views.calzado_crear, name='calzado_crear'),
