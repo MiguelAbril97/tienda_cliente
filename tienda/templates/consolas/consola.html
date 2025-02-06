@@ -9,7 +9,7 @@
         <p><strong>Memoria:</strong> {{ consola.memoria }}</p>
         <p><strong>Vendedor:</strong> {{ consola.producto.vendedor.username }}</p>
         <ul class="list-group">
-            {% for categoria in calzado.producto.categorias %}
+            {% for categoria in consola.producto.categorias %}
                 <li class="list-group-item">
                     {{ categoria.categoria.nombre }}
                 </li>

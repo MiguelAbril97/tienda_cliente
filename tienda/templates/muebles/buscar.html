@@ -3,7 +3,10 @@
 <form action="{% url 'muebles_buscar' %}" method="GET">
     
     {% csrf_token %}
-
+    <div>
+        {% bootstrap_field formulario.buscarNombre show_label=True %}
+    </div>
+        
     <div class="mb-4">
         {% bootstrap_field formulario.buscarMaterial show_label=True %}
     </div>
