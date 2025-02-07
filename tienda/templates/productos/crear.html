@@ -1,12 +1,33 @@
-{% extends "principal.html" %}
+{% load django_bootstrap5 %}
+{% bootstrap_css %}
 
-{% block contenido %}
-<form action = "{% url 'producto_crear' %}" method = "post"> 
-    
-    {% load django_bootstrap5 %}
-    {% csrf_token %} 
-    {% bootstrap_form formulario %}         
+<form method="POST" class="needs-validation" novalidate>
+    {% csrf_token %}
 
-    {% bootstrap_button "Enviar" button_type="submit" button_class="btn-primary" %}
+    <div class="mb-4">
+        {% bootstrap_field form.nombre show_label=True %}
+    </div>
+
+    <div class="mb-4">
+        {% bootstrap_field form.descripcion show_label=True %}
+    </div>
+
+    <div class="mb-4">
+        {% bootstrap_field form.estado show_label=True %}
+    </div>
+
+    <div class="mb-4">
+        {% bootstrap_field form.fecha_de_publicacion show_label=True %}
+    </div>
+
+    <div class="mb-4">
+        {% bootstrap_field form.vendedor show_label=True %}
+    </div>
+
+    <div class="mb-4">
+        {% bootstrap_field form.categorias show_label=True %}
+    </div>
+
+    {% bootstrap_button "Guardar" button_type="submit" button_class="btn-primary" %}
+    <a href="{% url 'productos_index' %}" class="btn btn-secondary ms-2">Cancelar</a>
 </form>
-{% endblock %}

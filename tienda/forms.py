@@ -1,6 +1,7 @@
 from django import forms
 from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
+from .helper import helper
 
 class BusquedaProductoSimple(forms.Form):
     textoBusqueda = forms.CharField(required=True)
@@ -39,6 +40,47 @@ class BuscarProducto(forms.Form):
         label="Vendedor",
         required=False,
     ) 
+ 
+class ProductoForm(forms.Form):
+        
+    ESTADOS=[
+        ("CN", "Como nuevo"),
+        ("U", "Usado"),
+        ("MU", "Muy usado"),
+    ]
+    nombre = forms.CharField(required=True, label="Nombre")
+    descripcion = forms.CharField(required=True,label="Descripción")
+    estado = forms.MultipleChoiceField(
+        choices=ESTADOS,
+        required=True,
+        widget=forms.CheckboxSelectMultiple(),
+        label="Estado"
+    )
+    fecha_de_publicacion = forms.DateTimeField(
+        label="Fecha de Publicación",
+        required=True,
+        widget=forms.DateTimeInput(format="%Y-%m-%d %H:%M:%S", attrs={"type": "datetime-local"})
+    )
+   
+    def __init__(self, *args, **kwargs):
+        super(ProductoForm, self).__init__(*args, **kwargs)
+        
+        vendedoresDisponibles = helper.obtener_vendedores()
+        self.fields['vendedor'] = forms.ChoiceField(
+            choices=vendedoresDisponibles,
+            required=True,
+            widget=forms.Select(),
+            label="Vendedor"
+        )
+
+        categoriasDisponibles = helper.obtener_categorias()
+        self.fields['categorias'] = forms.MultipleChoiceField(
+            choices=categoriasDisponibles,
+            required=True,
+            widget=forms.CheckboxSelectMultiple(),
+            label="Categorías"
+        )
+    
 
 class BuscarCalzado(forms.Form):
     
