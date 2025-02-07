@@ -22,7 +22,7 @@ def crear_cabecera():
     }
 
 def peticion_v1(direccion):
-    return 'http://127.0.0.1:8000/api/v1/' + direccion+'/'
+    return 'https://mabrala.pythonanywhere.com/api/v1/' + direccion+'/'
 
 def respuesta(objeto):
     return objeto.json()
