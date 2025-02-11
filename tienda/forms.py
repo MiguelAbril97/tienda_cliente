@@ -42,26 +42,43 @@ class BuscarProducto(forms.Form):
     ) 
  
 class ProductoForm(forms.Form):
-        
     ESTADOS=[
         ("CN", "Como nuevo"),
         ("U", "Usado"),
         ("MU", "Muy usado"),
     ]
-    nombre = forms.CharField(required=True, label="Nombre")
-    descripcion = forms.CharField(required=True,label="Descripción")
-    estado = forms.MultipleChoiceField(
+    nombre = forms.CharField(
+        required=True, 
+        label="Nombre",
+        max_length=100  
+    )
+    descripcion = forms.CharField(
+        required=True,
+        label="Descripción",
+        widget=forms.Textarea  
+    )
+    precio = forms.DecimalField(  
+        required=True,
+        label="Precio",
+        max_digits=10,
+        decimal_places=2,
+        min_value=0,
+        widget=forms.NumberInput(attrs={'min': '0'})
+    )
+    estado = forms.ChoiceField(  
         choices=ESTADOS,
         required=True,
-        widget=forms.CheckboxSelectMultiple(),
         label="Estado"
     )
     fecha_de_publicacion = forms.DateTimeField(
         label="Fecha de Publicación",
         required=True,
-        widget=forms.DateTimeInput(format="%Y-%m-%d %H:%M:%S", attrs={"type": "datetime-local"})
+        widget=forms.DateTimeInput(
+            format="%Y-%m-%d %H:%M:%S", 
+            attrs={"type": "datetime-local"}
+        )
     )
-   
+
     def __init__(self, *args, **kwargs):
         super(ProductoForm, self).__init__(*args, **kwargs)
         

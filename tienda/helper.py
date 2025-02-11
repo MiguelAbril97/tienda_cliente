@@ -1,5 +1,26 @@
-from .views import *
+
+import os
+from pathlib import Path
+import environ
+import requests
+
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'), True)
+env = environ.Env()
+
+def crear_cabecera():
+    return {
+        'Authorization': 'Bearer ' + env('TOKEN_ACCESO')
+    }
+def peticion_v1(direccion): 
+    return 'http://127.0.0.1:8000/api/v1/' + direccion+'/'
+def respuesta(objeto):
+    return objeto.json()
+
 class helper :
+    
     def obtener_categorias():
         headers = crear_cabecera()
         response = requests.get(peticion_v1('categorias'), headers=headers)
@@ -12,10 +33,10 @@ class helper :
     
     def obtener_vendedores():
         headers = crear_cabecera()
-        response = requests.get(peticion_v1('vendedores'), headers=headers)
+        response = requests.get(peticion_v1('vendedores/listar'), headers=headers)
         vendedores = respuesta(response)
         
         lista_vendedores = [("","Ninguno")]
         for vendedor in vendedores:
-            lista_vendedores.append((vendedor['id'], vendedor['username']))
+            lista_vendedores.append((vendedor['id'], vendedor['usuario']['username']))
         return lista_vendedores

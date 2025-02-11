@@ -8,6 +8,7 @@ urlpatterns = [
     path('productos-mejorado/',views.productos_listar_mejorado_api,name='lista_mejorada'),
     path('productos/buscar_simple/',views.producto_buscar_simple,name='productos_buscar_simple'),
     path('productos/buscar_avanzada/',views.producto_buscar,name='productos_buscar'),
+    path('productos/crear/',views.producto_crear,name='productos_crear'),
     path('calzados/',views.calzado_listar,name='calzados'),
     path('calzados/buscar/',views.calzado_buscar,name='calzados_buscar'),
     path('consolas/',views.consolas_listar,name='consolas'),

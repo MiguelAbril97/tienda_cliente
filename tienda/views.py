@@ -1,3 +1,4 @@
+import datetime
 from django.shortcuts import render, redirect
 import requests
 from django.core import serializers
@@ -5,6 +6,7 @@ import environ
 import os
 from pathlib import Path
 from .forms import *
+import json
 from requests.exceptions import HTTPError
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,7 +24,7 @@ def crear_cabecera():
     }
 
 def peticion_v1(direccion):
-    return 'https://mabrala.pythonanywhere.com/api/v1/' + direccion+'/'
+    return 'http://127.0.0.1:8000/api/v1/' + direccion+'/'
 
 def respuesta(objeto):
     return objeto.json()
@@ -85,7 +87,59 @@ def producto_buscar(request):
     else:
         formulario = BuscarProducto(None)
     return render(request, 'productos/buscar.html', {"formulario":formulario})
-                
+
+def producto_crear(request):
+    if (request.method == 'POST'):
+        try:
+            formulario = ProductoForm(request.POST)
+            headers = crear_cabecera()
+            datos = formulario.data.copy()
+            datos['categorias'] = request.POST.getlist('categorias')          
+            
+            #Creo una copia de la fecha para poder convertirla al mismo formato que el timezone
+            fecha_copia = datos['fecha_de_publicacion']
+            
+            #Convierto la fecha a un formato datetime
+            #https://docs.python.org/3/library/datetime.html#datetime.datetime.strptime
+            fecha = datetime.strptime(fecha_copia, '%Y-%m-%dT%H:%M')
+            
+            #Uso el timezone.mae_aware para convertir la fecha a un formato que pueda ser enviado
+            #https://docs.djangoproject.com/en/5.0/ref/utils/#django.utils.timezone.make_aware
+            fecha_aware = timezone.make_aware(fecha)
+            
+            #Paso la fecha a datos
+            #https://docs.python.org/3/library/datetime.html#datetime.datetime.strftime
+            datos['fecha_de_publicacion'] = fecha_aware.strftime('%Y-%m-%d %H:%M:%S')
+            
+            response = requests.post(
+                                    peticion_v1('productos/crear'),
+                                    headers=headers,
+                                    data=json.dumps(datos)
+                                    )
+            if(response.status_code == requests.codes.ok):
+                return redirect("productos_listar")
+            else:
+                print(response.status_code)
+                response.raise_for_status()
+        except HTTPError as http_err:
+            print(f'Hubo un error en la petición: {http_err}')
+            if(response.status_code == 400):
+                errores = response.json()
+                for error in errores:
+                    formulario.add_error(error,errores[error])
+                return render(request, 
+                            'productos/crear.html',
+                            {"formulario":formulario})
+            else:
+                return mi_error_500(request)
+        except Exception as err:
+            print(f'Ocurrió un error: {err}')
+            return mi_error_500(request)
+    else:
+        formulario = ProductoForm(None)
+    return render(request, 'productos/crear.html', {"formulario":formulario})
+    
+           
 def calzado_listar(request):
     headers = crear_cabecera()
     response = requests.get(peticion_v1('calzados'), headers=headers)
