@@ -177,6 +177,39 @@ def calzado_buscar(request):
         formulario = BuscarCalzado(None)
     return render(request, 'calzados/buscar.html', {"formulario":formulario})
 
+def calzado_crear(request):
+    if (request.method == 'POST'):
+        try:
+            formulario = CalzadoForm(request.POST)
+            headers = crear_cabecera()
+            response = requests.post(
+                                    peticion_v1('calzados/crear'),
+                                    headers=headers,
+                                    data=json.dumps(formulario.data)
+            )
+            if(response.status_code == requests.codes.ok):
+                return redirect("calzado_listar")
+            else:
+                print(response.status_code)
+                response.raise_for_status()
+        except HTTPError as http_err:
+            print(f'Hubo un error en la petición: {http_err}')
+            if(response.status_code == 400):
+                errores = response.json()
+                for error in errores:
+                    formulario.add_error(error,errores[error])
+                return render(request, 
+                            'calzados/crear.html',
+                            {"formulario":formulario})
+            else:
+                return mi_error_500(request)
+        except Exception as err:
+            return mi_error_500(request)
+    else:
+        formulario = CalzadoForm(None)
+    return render(request, 'calzados/crear.html', {"formulario":formulario})
+    
+
 def consolas_listar(request):
     headers = crear_cabecera()
     response = requests.get(peticion_v1('consolas'), headers=headers)

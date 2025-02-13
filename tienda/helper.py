@@ -40,3 +40,13 @@ class helper :
         for vendedor in vendedores:
             lista_vendedores.append((vendedor['id'], vendedor['usuario']['username']))
         return lista_vendedores
+    
+    def obtener_productos():
+        headers = crear_cabecera()
+        response = requests.get(peticion_v1('productos-mejorado'), headers=headers)
+        productos = respuesta(response)
+        
+        lista_productos = [("","Ninguno")]
+        for producto in productos:
+            lista_productos.append((producto['id'], producto['nombre']))
+        return lista_productos

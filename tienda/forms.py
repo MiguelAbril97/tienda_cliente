@@ -128,7 +128,46 @@ class BuscarCalzado(forms.Form):
         min_value=0,
         widget=forms.NumberInput()
     )
-   
+
+class CalzadoForm(forms.Form):
+    MARCAS = [
+        ("NIKE", "Nike"),
+        ("ADID", "Adidas"),
+        ("PUMA", "Puma"),
+        ("RBK", "Reebok"),
+        ("NB", "New Balance"),
+        ("CLRK", "Clarks"),
+        ("GUCCI", "Gucci"),
+    ]
+    
+    talla = forms.CharField(max_length=2,
+                            required=True, 
+                            label="Talla")
+    marca = forms.CharField(
+        max_length=5,
+        choices=MARCAS,
+        required=True,
+    )
+    color = forms.CharField(max_length=20, 
+                            label="Color")
+    
+    material = forms.CharField(max_length=30,
+                               required=True, 
+                                label="Material"
+                                )
+    
+    def __init__(self, *args, **kwargs):
+        super(CalzadoForm, self).__init__(*args, **kwargs)
+        
+        productosDisponibles = helper.obtener_productos()
+        self.fields['vendedor'] = forms.ChoiceField(
+            choices=productosDisponibles,
+            required=True,
+            widget=forms.Select(),
+            label="Producto"
+        )
+
+       
     
 class BuscarMueble(forms.Form):
     buscarNombre = forms.CharField(required=False, label="Nombre")
