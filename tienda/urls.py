@@ -3,7 +3,7 @@ from .import views
 
     
 urlpatterns = [
-    path('',views.index),
+    path('',views.index, name='index'),
     path('productos/',views.productos_listar_api,name='lista_basica'),
     path('productos-mejorado/',views.productos_listar_mejorado_api,name='lista_mejorada'),
     path('productos/buscar_simple/',views.producto_buscar_simple,name='productos_buscar_simple'),

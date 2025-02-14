@@ -41,6 +41,16 @@ class helper :
             lista_vendedores.append((vendedor['id'], vendedor['usuario']['username']))
         return lista_vendedores
     
+    def obtener_compradores():
+        headers = crear_cabecera()
+        response = requests.get(peticion_v1('compradores/listar'), headers=headers)
+        compradores = respuesta(response)
+        
+        lista_compradores = [("","Ninguno")]
+        for comprador in compradores:
+            lista_compradores.append((comprador['id'], comprador['usuario']['username']))
+        return lista_compradores
+    
     def obtener_productos():
         headers = crear_cabecera()
         response = requests.get(peticion_v1('productos-mejorado'), headers=headers)
@@ -50,3 +60,13 @@ class helper :
         for producto in productos:
             lista_productos.append((producto['id'], producto['nombre']))
         return lista_productos
+    
+    def obtener_compras():
+        headers = crear_cabecera()
+        response = requests.get(peticion_v1('compras/listar'), headers=headers)
+        compras = respuesta(response)
+        
+        lista_compras = [("","Ninguna")]
+        for compra in compras:
+            lista_compras.append((compra['id'], compra['producto']['nombre']))
+        return lista_compras
