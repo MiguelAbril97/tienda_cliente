@@ -1,7 +1,7 @@
 from django import forms
 from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
-from .helper import helper
+from .helper import *
 
 class BusquedaProductoSimple(forms.Form):
     textoBusqueda = forms.CharField(required=True)
@@ -97,7 +97,6 @@ class ProductoForm(forms.Form):
             widget=forms.CheckboxSelectMultiple(),
             label="Categorías"
         )
-    
 
 class BuscarCalzado(forms.Form):
     
@@ -208,6 +207,23 @@ class BuscarMueble(forms.Form):
         widget=forms.NumberInput()
     )
     
+class MueblesForm(forms.Form):
+    material = forms.CharField(max_length=30, required=True, label="Material")
+    ancho = forms.FloatField(required=True, label="Ancho")
+    alto = forms.FloatField(required=True, label="Alto")
+    profundidad = forms.FloatField(required=True, label="Profundidad")
+    peso = forms.IntegerField(required=True, label="Peso")
+
+    def __init__(self, *args, **kwargs):
+        super(MueblesForm, self).__init__(*args, **kwargs)
+        productosDisponibles = helper.obtener_productos()
+        self.fields['producto'] = forms.ChoiceField(
+            choices=productosDisponibles,
+            required=True,
+            widget=forms.Select(),
+            label="Producto"
+        )    
+
 
 
 class BuscarConsola(forms.Form):
@@ -225,3 +241,18 @@ class BuscarConsola(forms.Form):
         min_value=0,
         widget=forms.NumberInput(attrs={'placeholder': '1000.00'})
     )
+
+class ConsolasForm(forms.Form):
+    modelo = forms.CharField(max_length=50, required=True, label="Modelo")
+    color = forms.CharField(max_length=20, required=True, label="Color")
+    memoria = forms.CharField(max_length=20, required=True, label="Memoria")
+
+    def __init__(self, *args, **kwargs):
+        super(ConsolasForm, self).__init__(*args, **kwargs)
+        productosDisponibles = helper.obtener_productos()
+        self.fields['producto'] = forms.ChoiceField(
+            choices=productosDisponibles,
+            required=True,
+            widget=forms.Select(),
+            label="Producto"
+        )
