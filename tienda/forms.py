@@ -207,7 +207,7 @@ class BuscarMueble(forms.Form):
         widget=forms.NumberInput()
     )
     
-class MueblesForm(forms.Form):
+class MuebleForm(forms.Form):
     material = forms.CharField(max_length=30, required=True, label="Material")
     ancho = forms.FloatField(required=True, label="Ancho")
     alto = forms.FloatField(required=True, label="Alto")
@@ -242,7 +242,7 @@ class BuscarConsola(forms.Form):
         widget=forms.NumberInput(attrs={'placeholder': '1000.00'})
     )
 
-class ConsolasForm(forms.Form):
+class ConsolaForm(forms.Form):
     modelo = forms.CharField(max_length=50, required=True, label="Modelo")
     color = forms.CharField(max_length=20, required=True, label="Color")
     memoria = forms.CharField(max_length=20, required=True, label="Memoria")

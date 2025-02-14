@@ -156,7 +156,7 @@ def calzado_buscar(request):
                                     params=formulario.data)
             if response.status_code == requests.codes.ok:
                 calzados = respuesta(response)
-                return render(request, 'calzados/lista.html', {'calzados':calzados})
+                return render(request, 'calzados_lista.html', {'calzados':calzados})
             else:
                 print(response.status_code)
                 response.raise_for_status()
@@ -247,6 +247,38 @@ def consola_buscar(request):
         formulario = BuscarConsola(None)
     return render(request, 'consolas/buscar.html', {"formulario":formulario})
 
+def consola_crear(request):
+    if (request.method == 'POST'):
+        try:
+            formulario = ConsolaForm(request.POST)
+            headers = crear_cabecera()
+            response = requests.post(
+                                    peticion_v1('consolas/crear'),
+                                    headers=headers,
+                                    data=json.dumps(formulario.data)
+            )
+            if(response.status_code == requests.codes.ok):
+                return redirect("consolas_listar")
+            else:
+                print(response.status_code)
+                response.raise_for_status()
+        except HTTPError as http_err:
+            print(f'Hubo un error en la petición: {http_err}')
+            if(response.status_code == 400):
+                errores = response.json()
+                for error in errores:
+                    formulario.add_error(error,errores[error])
+                return render(request, 
+                            'consolas/crear.html',
+                            {"formulario":formulario})
+            else:
+                return mi_error_500(request)
+        except Exception as err:
+            return mi_error_500(request)
+    else:
+        formulario = ConsolaForm(None)
+    return render(request, 'consolas/crear.html', {"formulario":formulario})
+
 def muebles_listar(request):
     headers = crear_cabecera()
     response = requests.get(peticion_v1('muebles'), headers=headers)
@@ -283,6 +315,38 @@ def mueble_buscar(request):
     else:
         formulario = BuscarMueble(None)
     return render(request, 'muebles/buscar.html', {"formulario":formulario})
+
+def mueble_crear(request):
+    if (request.method == 'POST'):
+        try:
+            formulario = MuebleForm(request.POST)
+            headers = crear_cabecera()
+            response = requests.post(
+                                    peticion_v1('muebles/crear'),
+                                    headers=headers,
+                                    data=json.dumps(formulario.data)
+            )
+            if(response.status_code == requests.codes.ok):
+                return redirect("muebles_listar")
+            else:
+                print(response.status_code)
+                response.raise_for_status()
+        except HTTPError as http_err:
+            print(f'Hubo un error en la petición: {http_err}')
+            if(response.status_code == 400):
+                errores = response.json()
+                for error in errores:
+                    formulario.add_error(error,errores[error])
+                return render(request, 
+                            'muebles/crear.html',
+                            {"formulario":formulario})
+            else:
+                return mi_error_500(request)
+        except Exception as err:
+            return mi_error_500(request)
+    else:
+        formulario = MuebleForm(None)
+    return render(request, 'muebles/crear.html', {"formulario":formulario})
 
 def mi_error_400(request, exception=None):
     return render(request, 'errores/400.html', None, None, 400)

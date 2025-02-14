@@ -1,12 +1,24 @@
-{% extends "principal.html" %}
+{% load django_bootstrap5 %}
+{% bootstrap_css %}
 
-{% block contenido %}
-<form action = "{% url 'consola_crear' %}" method = "post"> 
-    
-    {% load django_bootstrap5 %}
-    {% csrf_token %} 
-    {% bootstrap_form formulario %}         
+<form action="{% url 'consolas_crear' %}" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
 
-    {% bootstrap_button "Enviar" button_type="submit" button_class="btn-primary" %}
+    <div class="mb-4">
+        {% bootstrap_field form.modelo show_label=True %}
+    </div>
+
+    <div class="mb-4">
+        {% bootstrap_field form.color show_label=True %}
+    </div>
+
+    <div class="mb-4">
+        {% bootstrap_field form.memoria show_label=True %}
+    </div>
+
+    <div class="mb-4">
+        {% bootstrap_field form.producto show_label=True %}
+    </div>
+
+    {% bootstrap_button "Guardar" button_type="submit" button_class="btn-primary" %}
 </form>
-{% endblock %}

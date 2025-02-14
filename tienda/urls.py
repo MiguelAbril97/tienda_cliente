@@ -14,8 +14,10 @@ urlpatterns = [
     path('calzados/buscar/',views.calzado_buscar,name='calzados_buscar'),
     path('consolas/',views.consolas_listar,name='consolas'),
     path('consolas/buscar/',views.consola_buscar,name='consolas_buscar'),
+    path('consolas_crear/',views.consola_crear,name='consolas_crear'),
     path('muebles/',views.muebles_listar,name='muebles'),
     path('muebles/buscar/',views.mueble_buscar,name='muebles_buscar'),
+    path('muebles_crear/',views.mueble_crear,name='muebles_crear'),
     
     #CRUD calzado
     # path('calzado/crear', views.calzado_crear, name='calzado_crear'),
