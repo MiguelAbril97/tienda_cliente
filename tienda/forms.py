@@ -98,6 +98,14 @@ class ProductoForm(forms.Form):
             label="Categorías"
         )
     
+class ProductoActualizarNombreForm(forms.Form):
+    nombre = forms.CharField(
+        required=True, 
+        label="Nombre",
+        max_length=100  
+    )
+    
+    
 class CompraForm(forms.Form):
     GARANTIA = [
         ("UNO", "Un año"),
@@ -127,6 +135,13 @@ class CompraForm(forms.Form):
             label="Productos"
         )
 
+class CompraActualizarGarantiaForm(forms.Form):
+    GARANTIA = [
+        ("UNO", "Un año"),
+        ("DOS", "Dos años"),
+    ]
+    garantia = forms.ChoiceField(choices=GARANTIA, required=True, label="Garantía")
+        
 
 class ValoracionForm(forms.Form):
     puntuacion = forms.IntegerField(min_value=1, 
@@ -160,8 +175,22 @@ class ValoracionForm(forms.Form):
             label="Compra"
         )
 
+class ValoracionActualizarPuntuacionForm(forms.Form):
+    puntuacion = forms.IntegerField(min_value=1, 
+                                    max_value=5, 
+                                    required=True, 
+                                    label="Puntuación")
     
 
+
+################################################
+################################################
+################################################
+#######################
+#  OTROS FORMULARIOS 
+
+################################################
+################################################
 
 
 class BuscarCalzado(forms.Form):

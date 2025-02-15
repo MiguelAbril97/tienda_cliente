@@ -140,6 +140,56 @@ def producto_crear(request):
         formulario = ProductoForm(None)
     return render(request, 'productos/crear.html', {"formulario":formulario})
 
+def producto_editar(request, producto_id):
+
+    datosFormulario = None
+    
+    if request.method == "POST":
+        datosFormulario = request.POST
+    
+    producto = helper.obtener_producto(producto_id)
+    formulario = ProductoForm(datosFormulario,
+                              initial={
+                               'nombre': producto['nombre'],
+                               'descripcion': producto['descripcion'],
+                               'precio': producto['precio'],
+                               'estado': producto['estado'],
+                               'fecha_de_publicacion': datetime.datetime.strptime(
+                                   producto['fecha_de_publicacion'], '%Y-%m-%d %H:%M:%S'),
+                                'vendedor': producto['vendedor']['id'],
+                                'categorias': [categoria['id'] for categoria in producto['categorias']]
+                              }
+                            )
+    if request.method == 'POST':
+        formulario = ProductoForm(request.POST)
+        datos = formulario.data.copy()
+        datos['categorias'] = request.POST.getlist('categorias')
+        
+        fecha_copia = request.POST['fecha_de_publicacion']
+        fecha = datetime.strptime(fecha_copia, '%Y-%m-%dT%H:%M')
+        fecha_aware = timezone.make_aware(fecha)
+        datos['fecha_de_publicacion'] = fecha_aware.strftime('%Y-%m-%d %H:%M:%S')
+        
+        response = requests.put(
+                                peticion_v1('productos/actualizar/'+str(producto_id)),
+                                headers=crear_cabecera(),
+                                data=json.dumps(datos)
+                                )
+        if(response.status_code == requests.codes.ok):
+            return redirect("productos_listar")
+        else:
+            if(response.status_code == 400):
+                errores = response.json()
+                for error in errores:
+                    formulario.add_error(error,errores[error])
+                return render(request, 
+                            'productos/crear.html',
+                            {"formulario":formulario})
+            else:
+                return mi_error_500(request)
+    return render(request, 'productos/crear.html', {"formulario":formulario})
+        
+
 #CRUD ManyToMany con tabla intermedia
 def compra_crear(request):
     if (request.method == 'POST'):    

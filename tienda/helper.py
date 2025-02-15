@@ -21,6 +21,8 @@ def respuesta(objeto):
 
 class helper :
     
+    ################################################
+    # OBTENER LISTAS #
     def obtener_categorias():
         headers = crear_cabecera()
         response = requests.get(peticion_v1('categorias'), headers=headers)
@@ -70,3 +72,24 @@ class helper :
         for compra in compras:
             lista_compras.append((compra['id'], compra['producto']['nombre']))
         return lista_compras
+    
+    ################################################
+    # OBTENER UN SOLO ELEMENTO #
+    
+    def obtener_producto(id):
+        headers = crear_cabecera()
+        response = requests.get(peticion_v1('productos/'+str(id)), headers=headers)
+        producto = respuesta(response)
+        return producto
+    
+    def obtener_compra(id):
+        headers = crear_cabecera()
+        response = requests.get(peticion_v1('compras/'+str(id)), headers=headers)
+        compra = respuesta(response)
+        return compra
+    
+    def obtener_valoracion(id):
+        headers = crear_cabecera()
+        response = requests.get(peticion_v1('valoraciones/'+str(id)), headers=headers)
+        valoracion = respuesta(response)
+        return valoracion
