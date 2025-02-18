@@ -73,10 +73,8 @@ class ProductoForm(forms.Form):
     fecha_de_publicacion = forms.DateTimeField(
         label="Fecha de Publicación",
         required=True,
-        widget=forms.DateTimeInput(
-            format="%Y-%m-%d %H:%M:%S", 
-            attrs={"type": "datetime-local"}
-        )
+        initial=timezone.now,
+        widget=forms.DateTimeInput(format='%Y-%m-%dT%H:%M')
     )
 
     def __init__(self, *args, **kwargs):
@@ -112,9 +110,18 @@ class CompraForm(forms.Form):
         ("DOS", "Dos años"),
     ]
     
-    fecha_compra = forms.DateTimeField(required=True, label="Fecha de Compra", widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}))
-    total = forms.DecimalField(max_digits=10, decimal_places=2, required=True, label="Total")
-    garantia = forms.ChoiceField(choices=GARANTIA, required=True, label="Garantía")
+    fecha_compra = forms.DateTimeField(required=True, 
+                                       label="Fecha de Compra", 
+                                       initial=timezone.now,
+                                        widget=forms.DateTimeInput(format='%Y-%m-%dT%H:%M')
+                                        )
+    total = forms.DecimalField(max_digits=10,
+                               decimal_places=2,
+                               required=True,
+                               label="Total")
+    garantia = forms.ChoiceField(choices=GARANTIA,
+                                 required=True,
+                                 label="Garantía")
 
     def __init__(self, *args, **kwargs):
         super(CompraForm, self).__init__(*args, **kwargs)
@@ -131,8 +138,8 @@ class CompraForm(forms.Form):
         self.fields['producto'] = forms.MultipleChoiceField(
             choices=productos_disponibles,
             required=True,
-            widget=forms.SelectMultiple(),
-            label="Productos"
+            label="Productos",
+            help_text="Mantén pulsada la tecla control para seleccionar varios elementos"
         )
 
 class CompraActualizarGarantiaForm(forms.Form):
@@ -237,9 +244,9 @@ class CalzadoForm(forms.Form):
     talla = forms.CharField(max_length=2,
                             required=True, 
                             label="Talla")
-    marca = forms.CharField(
-        max_length=5,
+    marca = forms.ChoiceField(
         choices=MARCAS,
+        widget=forms.Select,
         required=True,
     )
     color = forms.CharField(max_length=20, 

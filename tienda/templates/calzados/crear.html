@@ -5,23 +5,23 @@
     {% csrf_token %}
 
     <div class="mb-4">
-        {% bootstrap_field form.talla show_label=True %}
+        {% bootstrap_field formulario.talla show_label=True %}
     </div>
 
     <div class="mb-4">
-        {% bootstrap_field form.marca show_label=True %}
+        {% bootstrap_field formulario.marca show_label=True %}
     </div>
 
     <div class="mb-4">
-        {% bootstrap_field form.color show_label=True %}
+        {% bootstrap_field formulario.color show_label=True %}
     </div>
 
     <div class="mb-4">
-        {% bootstrap_field form.material show_label=True %}
+        {% bootstrap_field formulario.material show_label=True %}
     </div>
 
     <div class="mb-4">
-        {% bootstrap_field form.vendedor show_label=True %}
+        {% bootstrap_field formulario.vendedor show_label=True %}
     </div>
 
     {% bootstrap_button "Guardar" button_type="submit" button_class="btn-primary" %}

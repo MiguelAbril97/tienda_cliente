@@ -1,7 +1,6 @@
 import datetime
 from django.shortcuts import render, redirect
 import requests
-from django.core import serializers
 import environ
 import os
 from pathlib import Path
@@ -20,7 +19,8 @@ def index(request):
 
 def crear_cabecera():
     return {
-        'Authorization': 'Bearer ' + env('TOKEN_ACCESO')
+        'Authorization': 'Bearer ' + env('TOKEN_ACCESO'),
+        "Content-Type": "application/json"
     }
 
 def peticion_v1(direccion):
@@ -102,7 +102,7 @@ def producto_crear(request):
             
             #Convierto la fecha a un formato datetime
             #https://docs.python.org/3/library/datetime.html#datetime.datetime.strptime
-            fecha = datetime.strptime(fecha_copia, '%Y-%m-%dT%H:%M')
+            fecha = datetime.datetime.strptime(fecha_copia, '%Y-%m-%dT%H:%M')
             
             #Uso el timezone.mae_aware para convertir la fecha a un formato que pueda ser enviado
             #https://docs.djangoproject.com/en/5.0/ref/utils/#django.utils.timezone.make_aware
@@ -118,7 +118,7 @@ def producto_crear(request):
                                     data=json.dumps(datos)
                                     )
             if(response.status_code == requests.codes.ok):
-                return redirect("productos_listar")
+                return redirect("lista_mejorada")
             else:
                 print(response.status_code)
                 response.raise_for_status()
@@ -176,7 +176,7 @@ def producto_editar(request, producto_id):
                                 data=json.dumps(datos)
                                 )
         if(response.status_code == requests.codes.ok):
-            return redirect("productos_listar")
+            return redirect("lista_mejorada")
         else:
             if(response.status_code == 400):
                 errores = response.json()
@@ -208,7 +208,7 @@ def producto_actualizar_nombre(request, producto_id):
                                     headers=headers, 
                                     data=json.dumps(formulario.data))
             if response.status_code == requests.codes.ok:
-                return redirect("productos_listar")
+                return redirect("lista_mejorada")
             else:
                 print(response.status_code)
                 response.raise_for_status()
@@ -222,14 +222,14 @@ def producto_eliminar(request, producto_id):
         response = requests.delete(peticion_v1('productos/eliminar/'+str(producto_id)), 
                                 headers=headers)
         if( response.status_code == requests.codes.ok):
-            return redirect("productos_listar")
+            return redirect("lista_mejorada")
         else:
             print(response.status_code)
             response.raise_for_status()
     except Exception as err:
         print(f'Ocurrió un error: {err}')
         return mi_error_500(request)
-    return redirect("productos_listar")
+    return redirect("lista_mejorada")
             
 
 #CRUD ManyToMany con tabla intermedia
@@ -239,10 +239,10 @@ def compra_crear(request):
             formulario = CompraForm(request.POST)
             headers = crear_cabecera()
             datos = formulario.data.copy()
-            datos = formulario.data.copy()
             
+            datos['producto'] = request.POST.getlist('producto')
             fecha_copia = datos['fecha_compra']
-            fecha = datetime.strptime(fecha_copia, '%Y-%m-%dT%H:%M')
+            fecha = datetime.datetime.strptime(fecha_copia, '%Y-%m-%dT%H:%M')
             fecha_aware = timezone.make_aware(fecha)
             datos['fecha_compra'] = fecha_aware.strftime('%Y-%m-%d %H:%M:%S')
             
@@ -252,7 +252,7 @@ def compra_crear(request):
                                     data=json.dumps(datos)
                                     )
             if(response.status_code == requests.codes.ok):
-                return redirect("productos_listar")
+                return redirect("lista_mejorada")
             else:
                 print(response.status_code)
                 response.raise_for_status()
@@ -307,7 +307,7 @@ def compra_editar(request, compra_id):
                                 data=json.dumps(datos)
                                 )
         if(response.status_code == requests.codes.ok):
-            return redirect("productos_listar")
+            return redirect("lista_mejorada")
         else:
             if(response.status_code == 400):
                 errores = response.json()
@@ -339,7 +339,7 @@ def compra_actualizar_garantia(request, compra_id):
                                     headers=headers, 
                                     data=json.dumps(formulario.data))
             if response.status_code == requests.codes.ok:
-                return redirect("productos_listar")
+                return redirect("lista_mejorada")
             else:
                 print(response.status_code)
                 response.raise_for_status()
@@ -354,14 +354,14 @@ def compra_eliminar(request, compra_id):
         response = requests.delete(peticion_v1('compras/eliminar/'+str(compra_id)), 
                                 headers=headers)
         if( response.status_code == requests.codes.ok):
-            return redirect("productos_listar")
+            return redirect("lista_mejorada")
         else:
             print(response.status_code)
             response.raise_for_status()
     except Exception as err:
         print(f'Ocurrió un error: {err}')
         return mi_error_500(request)
-    return redirect("productos_listar")
+    return redirect("lista_mejorada")
    
 #CRUD ManyToOne
 def valoracion_crear(request):
@@ -375,7 +375,7 @@ def valoracion_crear(request):
                                     data=json.dumps(formulario.data)
                                     )
             if(response.status_code == requests.codes.ok):
-                return redirect("productos_listar")
+                return redirect("lista_mejorada")
             else:
                 print(response.status_code)
                 response.raise_for_status()
@@ -393,6 +393,10 @@ def valoracion_crear(request):
         except Exception as err:
             print(f'Ocurrió un error: {err}')
             return mi_error_500(request)
+    else:
+        formulario = ValoracionForm(None)
+    return render(request, 'valoraciones/crear.html', {"formulario":formulario})
+        
 
 def valoracion_editar(request, valoracion_id):
     
@@ -427,7 +431,7 @@ def valoracion_editar(request, valoracion_id):
                                 data=json.dumps(datos)
                                 )
         if(response.status_code == requests.codes.ok):
-            return redirect("productos_listar")
+            return redirect("lista_mejorada")
         else:
             if(response.status_code == 400):
                 errores = response.json()
@@ -460,7 +464,7 @@ def valoracion_actualizar_puntuacion(request, valoracion_id):
                                     headers=headers, 
                                     data=json.dumps(formulario.data))
             if response.status_code == requests.codes.ok:
-                return redirect("productos_listar")
+                return redirect("lista_mejorada")
             else:
                 print(response.status_code)
                 response.raise_for_status()
@@ -474,14 +478,14 @@ def valoracion_eliminar(request, valoracion_id):
         response = requests.delete(peticion_v1('valoraciones/eliminar/'+str(valoracion_id)), 
                                 headers=headers)
         if(response.status_code == requests.codes.ok):
-            return redirect("productos_listar")
+            return redirect("lista_mejorada")
         else:
             print(response.status_code)
             response.raise_for_status()
     except Exception as err:
         print(f'Ocurrió un error: {err}')
         return mi_error_500(request)
-    return redirect("productos_listar")
+    return redirect("lista_mejorada")
 
 ################################################
 ################################################

@@ -5,19 +5,19 @@
     {% csrf_token %}
 
     <div class="mb-4">
-        {% bootstrap_field form.modelo show_label=True %}
+        {% bootstrap_field formulario.modelo show_label=True %}
     </div>
 
     <div class="mb-4">
-        {% bootstrap_field form.color show_label=True %}
+        {% bootstrap_field formulario.color show_label=True %}
     </div>
 
     <div class="mb-4">
-        {% bootstrap_field form.memoria show_label=True %}
+        {% bootstrap_field formulario.memoria show_label=True %}
     </div>
 
     <div class="mb-4">
-        {% bootstrap_field form.producto show_label=True %}
+        {% bootstrap_field formulario.producto show_label=True %}
     </div>
 
     {% bootstrap_button "Guardar" button_type="submit" button_class="btn-primary" %}

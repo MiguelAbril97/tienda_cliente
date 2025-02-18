@@ -5,27 +5,27 @@
     {% csrf_token %}
 
     <div class="mb-4">
-        {% bootstrap_field form.material show_label=True %}
+        {% bootstrap_field formulario.material show_label=True %}
     </div>
 
     <div class="mb-4">
-        {% bootstrap_field form.ancho show_label=True %}
+        {% bootstrap_field formulario.ancho show_label=True %}
     </div>
 
     <div class="mb-4">
-        {% bootstrap_field form.alto show_label=True %}
+        {% bootstrap_field formulario.alto show_label=True %}
     </div>
 
     <div class="mb-4">
-        {% bootstrap_field form.profundidad show_label=True %}
+        {% bootstrap_field formulario.profundidad show_label=True %}
     </div>
 
     <div class="mb-4">
-        {% bootstrap_field form.peso show_label=True %}
+        {% bootstrap_field formulario.peso show_label=True %}
     </div>
 
     <div class="mb-4">
-        {% bootstrap_field form.producto show_label=True %}
+        {% bootstrap_field formulario.producto show_label=True %}
     </div>
 
     {% bootstrap_button "Guardar" button_type="submit" button_class="btn-primary" %}
