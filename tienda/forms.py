@@ -97,6 +97,101 @@ class ProductoForm(forms.Form):
             widget=forms.CheckboxSelectMultiple(),
             label="Categorías"
         )
+    
+class ProductoActualizarNombreForm(forms.Form):
+    nombre = forms.CharField(
+        required=True, 
+        label="Nombre",
+        max_length=100  
+    )
+    
+    
+class CompraForm(forms.Form):
+    GARANTIA = [
+        ("UNO", "Un año"),
+        ("DOS", "Dos años"),
+    ]
+    
+    fecha_compra = forms.DateTimeField(required=True, label="Fecha de Compra", widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}))
+    total = forms.DecimalField(max_digits=10, decimal_places=2, required=True, label="Total")
+    garantia = forms.ChoiceField(choices=GARANTIA, required=True, label="Garantía")
+
+    def __init__(self, *args, **kwargs):
+        super(CompraForm, self).__init__(*args, **kwargs)
+        compradores_disponibles = helper.obtener_compradores()
+        productos_disponibles = helper.obtener_productos()
+        
+        self.fields['comprador'] = forms.ChoiceField(
+            choices=compradores_disponibles,
+            required=True,
+            widget=forms.Select(),
+            label="Comprador"
+        )
+        
+        self.fields['producto'] = forms.MultipleChoiceField(
+            choices=productos_disponibles,
+            required=True,
+            widget=forms.SelectMultiple(),
+            label="Productos"
+        )
+
+class CompraActualizarGarantiaForm(forms.Form):
+    GARANTIA = [
+        ("UNO", "Un año"),
+        ("DOS", "Dos años"),
+    ]
+    garantia = forms.ChoiceField(choices=GARANTIA, required=True, label="Garantía")
+        
+
+class ValoracionForm(forms.Form):
+    puntuacion = forms.IntegerField(min_value=1, 
+                                    max_value=5, 
+                                    required=True, 
+                                    label="Puntuación")
+    comentario = forms.CharField(widget=forms.Textarea, 
+                                 required=False, 
+                                 label="Comentario")
+    fecha_valoracion = forms.DateTimeField(required=True, 
+                                           label="Fecha de Valoración", 
+                                           widget=forms.DateTimeInput(
+                                               attrs={'type': 'datetime-local'}))
+
+    def __init__(self, *args, **kwargs):
+        super(ValoracionForm, self).__init__(*args, **kwargs)
+        usuarios_disponibles = helper.obtener_compradores()
+        compras_disponibles = helper.obtener_compras()
+        
+        self.fields['usuario'] = forms.ChoiceField(
+            choices=usuarios_disponibles,
+            required=True,
+            widget=forms.Select(),
+            label="Usuario"
+        )
+        
+        self.fields['compra'] = forms.ChoiceField(
+            choices=compras_disponibles,
+            required=True,
+            widget=forms.Select(),
+            label="Compra"
+        )
+
+class ValoracionActualizarPuntuacionForm(forms.Form):
+    puntuacion = forms.IntegerField(min_value=1, 
+                                    max_value=5, 
+                                    required=True, 
+                                    label="Puntuación")
+    
+
+
+################################################
+################################################
+################################################
+#######################
+#  OTROS FORMULARIOS 
+
+################################################
+################################################
+
 
 class BuscarCalzado(forms.Form):
     
