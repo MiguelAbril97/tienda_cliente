@@ -41,6 +41,18 @@ def productos_listar_mejorado_api(request):
     productos = respuesta(response)
     return render(request, 'productos/lista.html', {'productos':productos})
 
+def valoraciones_listar(request):
+    headers = crear_cabecera()
+    response = requests.get(peticion_v1('valoraciones/listar'), headers=headers)
+    valoraciones = respuesta(response)
+    return render(request, 'valoraciones/lista.html', {'valoraciones':valoraciones})
+
+def compras_listar(request):
+    headers = crear_cabecera()
+    response = requests.get(peticion_v1('compras/listar'), headers=headers)
+    compras = respuesta(response)
+    return render(request, 'compras/lista.html', {'compras':compras})
+
 def producto_buscar_simple(request):
     formulario = BusquedaProductoSimple(request.GET)
     
@@ -139,7 +151,7 @@ def producto_editar(request, producto_id):
                                'precio': producto['precio'],
                                'estado': producto['estado'],
                                'fecha_de_publicacion': datetime.strptime(
-                                   producto['fecha_de_publicacion'], '%Y-%m-%d %H:%M:%S'),
+                                   producto['fecha_de_publicacion'], '%Y-%m-%dT%H:%M:%S'),
                                 'vendedor': producto['vendedor']['id'],
                                 'categorias': [categoria['id'] for categoria in producto['categorias']]
                               }
@@ -148,12 +160,7 @@ def producto_editar(request, producto_id):
         formulario = ProductoForm(request.POST)
         datos = formulario.data.copy()
         datos['categorias'] = request.POST.getlist('categorias')
-        
-        fecha_copia = request.POST['fecha_de_publicacion']
-        fecha = datetime.strptime(fecha_copia, '%Y-%m-%d %H:%M:%S')
-        fecha_aware = timezone.make_aware(fecha)
-        datos['fecha_de_publicacion'] = fecha_aware.strftime('%Y-%m-%d %H:%M:%S')
-        
+          
         response = requests.put(
                                 peticion_v1('productos/editar/'+str(producto_id)),
                                 headers=crear_cabecera(),
@@ -180,8 +187,8 @@ def producto_actualizar_nombre(request, producto_id):
     if request.method == "POST":
         datosFormulario = request.POST
         
-        producto = helper.obtener_producto(producto_id)
-        formulario = ProductoActualizarNombreForm(datosFormulario,
+    producto = helper.obtener_producto(producto_id)
+    formulario = ProductoActualizarNombreForm(datosFormulario,
                                                   initial={'nombre': producto['nombre']})
         
     if (request.method == 'POST'):
@@ -225,18 +232,14 @@ def compra_crear(request):
             datos = formulario.data.copy()
             
             datos['producto'] = request.POST.getlist('producto')
-            fecha_copia = datos['fecha_compra']
-            fecha = datetime.strptime(fecha_copia, '%Y-%m-%d %H:%M:%S')
-            fecha_aware = timezone.make_aware(fecha)
-            datos['fecha_compra'] = fecha_aware.strftime('%Y-%m-%d %H:%M:%S')
-            
+
             response = requests.post(
                                     peticion_v1('compras/crear'),
                                     headers=headers,
                                     data=json.dumps(datos)
                                     )
             if(response.status_code == requests.codes.ok):
-                return redirect("lista_mejorada")
+                return redirect("compras_listar")
             else:
                 print(response.status_code)
                 response.raise_for_status()
@@ -269,10 +272,10 @@ def compra_editar(request, compra_id):
     formulario = CompraForm(datosFormulario,
                             initial={
                                 'fecha_compra': datetime.strptime(
-                                    compra['fecha_compra'], '%Y-%m-%d %H:%M:%S'),
+                                    compra['fecha_compra'], '%Y-%m-%dT%H:%M:%S'),
                                 'total': compra['total'],
                                 'garantia': compra['garantia'],
-                                'comprador': compra['comprador']['id'],
+                                'comprador': helper.obtener_compradores(), 
                                 'producto': [producto['id'] for producto in compra['producto']]
                             }
                         )
@@ -280,29 +283,24 @@ def compra_editar(request, compra_id):
         formulario = CompraForm(request.POST)
         datos = formulario.data.copy()
         
-        fecha_copia = request.POST['fecha_compra']
-        fecha = datetime.strptime(fecha_copia, '%Y-%m-%d %H:%M:%S')
-        fecha_aware = timezone.make_aware(fecha)
-        datos['fecha_compra'] = fecha_aware.strftime('%Y-%m-%d %H:%M:%S')
-        
         response = requests.put(
                                 peticion_v1('compras/editar/'+str(compra_id)),
                                 headers=crear_cabecera(),
                                 data=json.dumps(datos)
                                 )
         if(response.status_code == requests.codes.ok):
-            return redirect("lista_mejorada")
+            return redirect("compras_listar")
         else:
             if(response.status_code == 400):
                 errores = response.json()
                 for error in errores:
                     formulario.add_error(error,errores[error])
                 return render(request, 
-                            'compras/crear.html',
+                            'compras/editar.html',
                             {"formulario":formulario})
             else:
                 return mi_error_500(request)
-    return render(request, 'compras/crear.html', {"formulario":formulario, "compra":compra})
+    return render(request, 'compras/editar.html', {"formulario":formulario, "compra":compra})
 
 def compra_actualizar_garantia(request, compra_id):
     
@@ -311,8 +309,8 @@ def compra_actualizar_garantia(request, compra_id):
     if request.method == "POST":
         datosFormulario = request.POST
         
-        compra = helper.obtener_compra(compra_id)
-        formulario = CompraActualizarGarantiaForm(datosFormulario,
+    compra = helper.obtener_compra(compra_id)
+    formulario = CompraActualizarGarantiaForm(datosFormulario,
                                                  initial={'garantia': compra['garantia']})
 
     if (request.method == 'POST'):
@@ -323,7 +321,7 @@ def compra_actualizar_garantia(request, compra_id):
                                     headers=headers, 
                                     data=json.dumps(formulario.data))
             if response.status_code == requests.codes.ok:
-                return redirect("lista_mejorada")
+                return redirect("compras_listar")
             else:
                 print(response.status_code)
                 response.raise_for_status()
@@ -338,14 +336,14 @@ def compra_eliminar(request, compra_id):
         response = requests.delete(peticion_v1('compras/eliminar/'+str(compra_id)), 
                                 headers=headers)
         if( response.status_code == requests.codes.ok):
-            return redirect("lista_mejorada")
+            return redirect("compras_listar")
         else:
             print(response.status_code)
             response.raise_for_status()
     except Exception as err:
         print(f'Ocurrió un error: {err}')
         return mi_error_500(request)
-    return redirect("lista_mejorada")
+    return redirect("compras_listar")
    
 #CRUD ManyToOne
 def valoracion_crear(request):
@@ -359,7 +357,7 @@ def valoracion_crear(request):
                                     data=json.dumps(formulario.data)
                                     )
             if(response.status_code == requests.codes.ok):
-                return redirect("lista_mejorada")
+                return redirect("valoraciones_listar")
             else:
                 print(response.status_code)
                 response.raise_for_status()
@@ -395,7 +393,7 @@ def valoracion_editar(request, valoracion_id):
                                     'puntuacion': valoracion['puntuacion'],
                                     'comentario': valoracion['comentario'],
                                     'fecha_valoracion': datetime.strptime(
-                                        valoracion['fecha_valoracion'], '%Y-%m-%d %H:%M:%S'),
+                                        valoracion['fecha_valoracion'], '%Y-%m-%dT%H:%M:%S'),
                                     'usuario': valoracion['usuario']['id'],
                                     'compra': valoracion['compra']['id']
                                 }
@@ -404,30 +402,24 @@ def valoracion_editar(request, valoracion_id):
     if request.method == 'POST':
         formulario = ValoracionForm(request.POST)
         datos = formulario.data.copy()
-        
-        fecha_copia = request.POST['fecha_valoracion']
-        fecha = datetime.strptime(fecha_copia, '%Y-%m-%d %H:%M')
-        fecha_aware = timezone.make_aware(fecha)
-        datos['fecha_valoracion'] = fecha_aware.strftime('%Y-%m-%d %H:%M:%S')
-        
         response = requests.put(
                                 peticion_v1('valoraciones/editar/'+str(valoracion_id)),
                                 headers=crear_cabecera(),
                                 data=json.dumps(datos)
                                 )
         if(response.status_code == requests.codes.ok):
-            return redirect("lista_mejorada")
+            return redirect("valoraciones_listar")
         else:
             if(response.status_code == 400):
                 errores = response.json()
                 for error in errores:
                     formulario.add_error(error,errores[error])
                 return render(request, 
-                            'valoraciones/crear.html',
+                            'valoraciones/editar.html',
                             {"formulario":formulario})
             else:
                 return mi_error_500(request)
-    return render(request, 'valoraciones/crear.html', {"formulario":formulario, "valoracion":valoracion})
+    return render(request, 'valoraciones/editar.html', {"formulario":formulario, "valoracion":valoracion})
 
 
 def valoracion_actualizar_puntuacion(request, valoracion_id):
@@ -449,7 +441,7 @@ def valoracion_actualizar_puntuacion(request, valoracion_id):
                                     headers=headers, 
                                     data=json.dumps(formulario.data))
             if response.status_code == requests.codes.ok:
-                return redirect("lista_mejorada")
+                return redirect("valoraciones_listar")
             else:
                 print(response.status_code)
                 response.raise_for_status()
@@ -463,14 +455,14 @@ def valoracion_eliminar(request, valoracion_id):
         response = requests.delete(peticion_v1('valoraciones/eliminar/'+str(valoracion_id)), 
                                 headers=headers)
         if(response.status_code == requests.codes.ok):
-            return redirect("lista_mejorada")
+            return redirect("valoraciones_listar")
         else:
             print(response.status_code)
             response.raise_for_status()
     except Exception as err:
         print(f'Ocurrió un error: {err}')
         return mi_error_500(request)
-    return redirect("lista_mejorada")
+    return redirect("valoraciones_listar")
 
 ################################################
 ################################################

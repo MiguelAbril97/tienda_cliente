@@ -1,0 +1,28 @@
+{% load django_bootstrap5 %}
+{% bootstrap_css %}
+
+<form action="{% url 'valoraciones_editar' valoracion.id %}" method="POST">
+    {% csrf_token %}
+
+    <div class="mb-4">
+        {% bootstrap_field formulario.usuario show_label=True %}
+    </div>
+
+    <div class="mb-4">
+        {% bootstrap_field formulario.compra show_label=True %}
+    </div>
+
+    <div class="mb-4">
+        {% bootstrap_field formulario.puntuacion show_label=True %}
+    </div>
+
+    <div class="mb-4">
+        {% bootstrap_field formulario.comentario show_label=True %}
+    </div>
+
+    <div class="mb-4">
+        {% bootstrap_field formulario.fecha_valoracion show_label=True %}
+    </div>
+
+    {% bootstrap_button "Guardar" button_type="submit" button_class="btn-primary" %}
+</form>

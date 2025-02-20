@@ -1,11 +1,11 @@
 {% load django_bootstrap5 %}
 {% bootstrap_css %}
 
-<form action="{% url 'compras_actualizar_garantia' %}" method="POST" enctype="multipart/form-data">
+<form action="{% url 'compras_actualizar_garantia' compra.id %}" method="POST">
     {% csrf_token %}
 
     <div class="mb-4">
-        {% bootstrap_field form.garantia show_label=True %}
+        {% bootstrap_field formulario.garantia show_label=True %}
     </div>
 
     {% bootstrap_button "Actualizar" button_type="submit" button_class="btn-primary" %}

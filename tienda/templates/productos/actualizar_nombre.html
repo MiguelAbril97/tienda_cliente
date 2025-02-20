@@ -1,9 +1,9 @@
 {% load django_bootstrap5 %}
 {% bootstrap_css %}
 
-<form action="{% url 'productos_actualizar_nombre' producto.id%}" method="POST">
+<form action="{% url 'productos_actualizar' producto.id%}" method="post">
     {% csrf_token %}
-
+    
     <div class="mb-4">
         {% bootstrap_field formulario.nombre show_label=True %}
     </div>

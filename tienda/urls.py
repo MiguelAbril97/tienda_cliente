@@ -16,16 +16,18 @@ urlpatterns = [
     path('productos/eliminar/<int:producto_id>/',views.producto_eliminar,name='productos_eliminar'),
     
     ####CRUD COMPRA
+    path('compras/listar/',views.compras_listar,name='compras_listar'),
     path('compras/crear/',views.compra_crear,name='compras_crear'),
     path('compras/editar/<int:compra_id>/',views.compra_editar,name='compras_editar'),
     path('compras/actualizar/<int:compra_id>/',views.compra_actualizar_garantia,name='compras_actualizar_garantia'),
     path('compras/eliminar/<int:compra_id>/',views.compra_eliminar,name='compras_eliminar'),
     
     ### crud valoraciones
+    path('valoraciones/listar/',views.valoraciones_listar,name='valoraciones_listar'),
     path('valoraciones/crear/',views.valoracion_crear,name='valoraciones_crear'),
     path('valoraciones/editar/<int:valoracion_id>/',views.valoracion_editar,name='valoraciones_editar'),
     path('valoraciones/actualizar/<int:valoracion_id>/',views.valoracion_actualizar_puntuacion,name='valoraciones_actualizar_puntuacion'),
-    path('valoraciones/eliminar/<int:valoracion_id>/',views.valoracion_eliminar,name='valoracion_eliminar'),
+    path('valoraciones/eliminar/<int:valoracion_id>/',views.valoracion_eliminar,name='valoraciones_eliminar'),
     
     
     ####OTRAS URLS

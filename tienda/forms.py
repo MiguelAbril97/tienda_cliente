@@ -74,7 +74,9 @@ class ProductoForm(forms.Form):
         label="Fecha de Publicación",
         required=True,
         initial=timezone.now,
-        widget=forms.DateTimeInput(format='%Y-%m-%d %H:%M:%S')
+        widget=forms.DateTimeInput(
+            format='%Y-%m-%dT%H:%M'
+        )
     )
 
     def __init__(self, *args, **kwargs):
@@ -110,11 +112,14 @@ class CompraForm(forms.Form):
         ("DOS", "Dos años"),
     ]
     
-    fecha_compra = forms.DateTimeField(required=True, 
-                                       label="Fecha de Compra", 
-                                       initial=timezone.now,
-                                        widget=forms.DateTimeInput(format='%Y-%m-%dT%H:%M')
-                                        )
+    fecha_compra = forms.DateTimeField(
+        required=True, 
+        label="Fecha de Compra", 
+        initial=timezone.now,
+        widget=forms.DateTimeInput(
+            format='%Y-%m-%dT%H:%M'
+        )
+    )
     total = forms.DecimalField(max_digits=10,
                                decimal_places=2,
                                required=True,
@@ -158,10 +163,14 @@ class ValoracionForm(forms.Form):
     comentario = forms.CharField(widget=forms.Textarea, 
                                  required=False, 
                                  label="Comentario")
-    fecha_valoracion = forms.DateTimeField(required=True, 
-                                       label="Fecha de Valoración", 
-                                       initial=timezone.now,
-                                        widget=forms.DateTimeInput(format='%Y-%m-%dT%H:%M'))
+    fecha_valoracion = forms.DateTimeField(
+        required=True, 
+        label="Fecha de Valoración", 
+        initial=timezone.now,
+        widget=forms.DateTimeInput(
+            format='%Y-%m-%dT%H:%M'
+        )
+    )
 
     def __init__(self, *args, **kwargs):
         super(ValoracionForm, self).__init__(*args, **kwargs)

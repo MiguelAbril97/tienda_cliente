@@ -1,6 +1,13 @@
+{% load bootstrap_icons %}
+
 <div class="card h-100">
     <div class="card-body">
         <h2 class="card-title">Nombre: {{ producto.nombre }}</h2>
+        <div class="mb-2">
+            <button type="button" class="btn btn-outline-primary">
+                <a href="{% url 'productos_actualizar' producto.id %}"><span>{% bs_icon 'pencil' %}</span></a>
+            </button>
+        </div>
         <h5 class="card-subtitle mb-2 text-muted">Vendedor: {{ producto.vendedor.username }}</h5>
         <p class="card-text"><strong>Estado:</strong> {{ producto.estado}}</p>
         <p class="card-text"><strong>Precio:</strong> ${{ producto.precio }}</p>
@@ -10,12 +17,14 @@
         <ul class="list-group list-group-flush">
             {% for categoria in producto.categorias %}
                 <li class="list-group-item">
-                    {{categoria.categoria.nombre}}
+                    {{categoria.nombre}}
                 </li>
             {% endfor %}
         </ul>
     </div>
-    {% load bootstrap_icons %}
+    {% comment "" %}
+    ICONO EDITAR Y eliminar
+    {% endcomment %}
     <div class="row btn-group">
         <div class="mb-2">
             <button type="button" class="btn btn-outline-primary">

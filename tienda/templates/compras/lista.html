@@ -1,0 +1,14 @@
+<head>
+    {% load django_bootstrap5 %}
+    {% bootstrap_css %}
+    {% load static %}
+</head>
+<div class="container">
+    <div class="row">
+        {% for compra in compras %}
+            <div class="col-md-4 mb-4">
+                {% include 'compras/compra.html' %}
+            </div>
+        {% endfor %}
+    </div>
+</div>
