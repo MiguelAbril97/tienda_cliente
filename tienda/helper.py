@@ -1,4 +1,3 @@
-
 import os
 from pathlib import Path
 import environ
@@ -70,7 +69,9 @@ class helper :
         
         lista_compras = [("","Ninguna")]
         for compra in compras:
-            lista_compras.append((compra['id'], compra['producto']['nombre']))
+            # Convertimos la lista de productos en una cadena de texto
+            nombres_productos = ", ".join([producto['nombre'] for producto in compra['producto']])
+            lista_compras.append((compra['id'], f"Compra {compra['id']} - {nombres_productos}"))
         return lista_compras
     
     ################################################

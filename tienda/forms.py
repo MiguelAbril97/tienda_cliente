@@ -74,7 +74,7 @@ class ProductoForm(forms.Form):
         label="Fecha de Publicación",
         required=True,
         initial=timezone.now,
-        widget=forms.DateTimeInput(format='%Y-%m-%dT%H:%M')
+        widget=forms.DateTimeInput(format='%Y-%m-%d %H:%M:%S')
     )
 
     def __init__(self, *args, **kwargs):
@@ -159,9 +159,9 @@ class ValoracionForm(forms.Form):
                                  required=False, 
                                  label="Comentario")
     fecha_valoracion = forms.DateTimeField(required=True, 
-                                           label="Fecha de Valoración", 
-                                           widget=forms.DateTimeInput(
-                                               attrs={'type': 'datetime-local'}))
+                                       label="Fecha de Valoración", 
+                                       initial=timezone.now,
+                                        widget=forms.DateTimeInput(format='%Y-%m-%dT%H:%M'))
 
     def __init__(self, *args, **kwargs):
         super(ValoracionForm, self).__init__(*args, **kwargs)

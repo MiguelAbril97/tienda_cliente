@@ -5,23 +5,23 @@
     {% csrf_token %}
 
     <div class="mb-4">
-        {% bootstrap_field form.usuario show_label=True %}
+        {% bootstrap_field formulario.usuario show_label=True %}
     </div>
 
     <div class="mb-4">
-        {% bootstrap_field form.compra show_label=True %}
+        {% bootstrap_field formulario.compra show_label=True %}
     </div>
 
     <div class="mb-4">
-        {% bootstrap_field form.puntuacion show_label=True %}
+        {% bootstrap_field formulario.puntuacion show_label=True %}
     </div>
 
     <div class="mb-4">
-        {% bootstrap_field form.comentario show_label=True %}
+        {% bootstrap_field formulario.comentario show_label=True %}
     </div>
 
     <div class="mb-4">
-        {% bootstrap_field form.fecha_valoracion show_label=True %}
+        {% bootstrap_field formulario.fecha_valoracion show_label=True %}
     </div>
 
     {% bootstrap_button "Guardar" button_type="submit" button_class="btn-primary" %}

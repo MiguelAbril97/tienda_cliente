@@ -22,8 +22,8 @@ urlpatterns = [
     path('compras/eliminar/<int:compra_id>/',views.compra_eliminar,name='compras_eliminar'),
     
     ### crud valoraciones
-    path('valoraciones/crear/',views.valoracion_crear,name='valoracion_crear'),
-    path('valoraciones/editar/<int:valoracion_id>/',views.valoracion_editar,name='valoracion_editar'),
+    path('valoraciones/crear/',views.valoracion_crear,name='valoraciones_crear'),
+    path('valoraciones/editar/<int:valoracion_id>/',views.valoracion_editar,name='valoraciones_editar'),
     path('valoraciones/actualizar/<int:valoracion_id>/',views.valoracion_actualizar_puntuacion,name='valoraciones_actualizar_puntuacion'),
     path('valoraciones/eliminar/<int:valoracion_id>/',views.valoracion_eliminar,name='valoracion_eliminar'),
     

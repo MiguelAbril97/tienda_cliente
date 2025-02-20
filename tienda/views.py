@@ -1,4 +1,3 @@
-import datetime
 from django.shortcuts import render, redirect
 import requests
 import environ
@@ -7,6 +6,7 @@ from pathlib import Path
 from .forms import *
 import json
 from requests.exceptions import HTTPError
+from datetime import datetime
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -96,22 +96,6 @@ def producto_crear(request):
             headers = crear_cabecera()
             datos = formulario.data.copy()
             datos['categorias'] = request.POST.getlist('categorias')          
-            
-            #Creo una copia de la fecha para poder convertirla al mismo formato que el timezone
-            fecha_copia = datos['fecha_de_publicacion']
-            
-            #Convierto la fecha a un formato datetime
-            #https://docs.python.org/3/library/datetime.html#datetime.datetime.strptime
-            fecha = datetime.datetime.strptime(fecha_copia, '%Y-%m-%dT%H:%M')
-            
-            #Uso el timezone.mae_aware para convertir la fecha a un formato que pueda ser enviado
-            #https://docs.djangoproject.com/en/5.0/ref/utils/#django.utils.timezone.make_aware
-            fecha_aware = timezone.make_aware(fecha)
-            
-            #Paso la fecha a datos
-            #https://docs.python.org/3/library/datetime.html#datetime.datetime.strftime
-            datos['fecha_de_publicacion'] = fecha_aware.strftime('%Y-%m-%d %H:%M:%S')
-            
             response = requests.post(
                                     peticion_v1('productos/crear'),
                                     headers=headers,
@@ -154,7 +138,7 @@ def producto_editar(request, producto_id):
                                'descripcion': producto['descripcion'],
                                'precio': producto['precio'],
                                'estado': producto['estado'],
-                               'fecha_de_publicacion': datetime.datetime.strptime(
+                               'fecha_de_publicacion': datetime.strptime(
                                    producto['fecha_de_publicacion'], '%Y-%m-%d %H:%M:%S'),
                                 'vendedor': producto['vendedor']['id'],
                                 'categorias': [categoria['id'] for categoria in producto['categorias']]
@@ -166,7 +150,7 @@ def producto_editar(request, producto_id):
         datos['categorias'] = request.POST.getlist('categorias')
         
         fecha_copia = request.POST['fecha_de_publicacion']
-        fecha = datetime.strptime(fecha_copia, '%Y-%m-%dT%H:%M')
+        fecha = datetime.strptime(fecha_copia, '%Y-%m-%d %H:%M:%S')
         fecha_aware = timezone.make_aware(fecha)
         datos['fecha_de_publicacion'] = fecha_aware.strftime('%Y-%m-%d %H:%M:%S')
         
@@ -183,11 +167,11 @@ def producto_editar(request, producto_id):
                 for error in errores:
                     formulario.add_error(error,errores[error])
                 return render(request, 
-                            'productos/crear.html',
+                            'productos/editar.html',
                             {"formulario":formulario})
             else:
                 return mi_error_500(request)
-    return render(request, 'productos/crear.html', {"formulario":formulario})
+    return render(request, 'productos/editar.html', {"formulario":formulario, "producto":producto})
 
 def producto_actualizar_nombre(request, producto_id):
     
@@ -214,7 +198,7 @@ def producto_actualizar_nombre(request, producto_id):
                 response.raise_for_status()
         else:
             print(formulario.errors)
-    return render(request, 'productos/actualizar_nombre.html', {"formulario":formulario})
+    return render(request, 'productos/actualizar_nombre.html', {"formulario":formulario, "producto":producto})
 
 def producto_eliminar(request, producto_id):
     try:
@@ -242,7 +226,7 @@ def compra_crear(request):
             
             datos['producto'] = request.POST.getlist('producto')
             fecha_copia = datos['fecha_compra']
-            fecha = datetime.datetime.strptime(fecha_copia, '%Y-%m-%dT%H:%M')
+            fecha = datetime.strptime(fecha_copia, '%Y-%m-%d %H:%M:%S')
             fecha_aware = timezone.make_aware(fecha)
             datos['fecha_compra'] = fecha_aware.strftime('%Y-%m-%d %H:%M:%S')
             
@@ -284,7 +268,7 @@ def compra_editar(request, compra_id):
     compra = helper.obtener_compra(compra_id)
     formulario = CompraForm(datosFormulario,
                             initial={
-                                'fecha_compra': datetime.datetime.strptime(
+                                'fecha_compra': datetime.strptime(
                                     compra['fecha_compra'], '%Y-%m-%d %H:%M:%S'),
                                 'total': compra['total'],
                                 'garantia': compra['garantia'],
@@ -297,7 +281,7 @@ def compra_editar(request, compra_id):
         datos = formulario.data.copy()
         
         fecha_copia = request.POST['fecha_compra']
-        fecha = datetime.strptime(fecha_copia, '%Y-%m-%dT%H:%M')
+        fecha = datetime.strptime(fecha_copia, '%Y-%m-%d %H:%M:%S')
         fecha_aware = timezone.make_aware(fecha)
         datos['fecha_compra'] = fecha_aware.strftime('%Y-%m-%d %H:%M:%S')
         
@@ -318,7 +302,7 @@ def compra_editar(request, compra_id):
                             {"formulario":formulario})
             else:
                 return mi_error_500(request)
-    return render(request, 'compras/crear.html', {"formulario":formulario})
+    return render(request, 'compras/crear.html', {"formulario":formulario, "compra":compra})
 
 def compra_actualizar_garantia(request, compra_id):
     
@@ -345,7 +329,7 @@ def compra_actualizar_garantia(request, compra_id):
                 response.raise_for_status()
         else:
             print(formulario.errors)
-    return render(request, 'compras/actualizar_garantia.html', {"formulario":formulario})
+    return render(request, 'compras/actualizar_garantia.html', {"formulario":formulario, "compra":compra})
 
 
 def compra_eliminar(request, compra_id):
@@ -405,23 +389,24 @@ def valoracion_editar(request, valoracion_id):
     if request.method == "POST":
         datosFormulario = request.POST
 
-        valoracion = helper.obtener_valoracion(valoracion_id)
-        formulario = ValoracionForm(datosFormulario,
-                                    initial={
-                                        'puntuacion': valoracion['puntuacion'],
-                                        'comentario': valoracion['comentario'],
-                                        'fecha_valoracion': datetime.datetime.strptime(
-                                            valoracion['fecha_valoracion'], '%Y-%m-%d %H:%M:%S'),
-                                        'usuario': valoracion['usuario']['id'],
-                                        'compra': valoracion['compra']['id']
-                                    }
-                                )
+    valoracion = helper.obtener_valoracion(valoracion_id)
+    formulario = ValoracionForm(datosFormulario,
+                                initial={
+                                    'puntuacion': valoracion['puntuacion'],
+                                    'comentario': valoracion['comentario'],
+                                    'fecha_valoracion': datetime.strptime(
+                                        valoracion['fecha_valoracion'], '%Y-%m-%d %H:%M:%S'),
+                                    'usuario': valoracion['usuario']['id'],
+                                    'compra': valoracion['compra']['id']
+                                }
+                            )
+    
     if request.method == 'POST':
         formulario = ValoracionForm(request.POST)
         datos = formulario.data.copy()
         
         fecha_copia = request.POST['fecha_valoracion']
-        fecha = datetime.strptime(fecha_copia, '%Y-%m-%dT%H:%M')
+        fecha = datetime.strptime(fecha_copia, '%Y-%m-%d %H:%M')
         fecha_aware = timezone.make_aware(fecha)
         datos['fecha_valoracion'] = fecha_aware.strftime('%Y-%m-%d %H:%M:%S')
         
@@ -442,7 +427,7 @@ def valoracion_editar(request, valoracion_id):
                             {"formulario":formulario})
             else:
                 return mi_error_500(request)
-    return render(request, 'valoraciones/crear.html', {"formulario":formulario})
+    return render(request, 'valoraciones/crear.html', {"formulario":formulario, "valoracion":valoracion})
 
 
 def valoracion_actualizar_puntuacion(request, valoracion_id):
@@ -470,7 +455,7 @@ def valoracion_actualizar_puntuacion(request, valoracion_id):
                 response.raise_for_status()
         else:
             print(formulario.errors)
-    return render(request, 'valoraciones/actualizar_puntuacion.html', {"formulario":formulario})
+    return render(request, 'valoraciones/actualizar_puntuacion.html', {"formulario":formulario, "valoracion":valoracion})
 
 def valoracion_eliminar(request, valoracion_id):
     try:
