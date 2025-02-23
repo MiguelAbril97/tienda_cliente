@@ -1,7 +1,7 @@
 {% load django_bootstrap5 %}
 {% bootstrap_css %}
 
-<form action="{% url 'valoracion_actualizar_puntuacion' valoracion.id %}" method="POST" enctype="multipart/form-data">
+<form action="{% url 'valoraciones_actualizar_puntuacion' valoracion.id %}" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
 
     <div class="mb-4">

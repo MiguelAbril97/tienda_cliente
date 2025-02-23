@@ -1,5 +1,4 @@
 from django import forms
-from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
 from .helper import *
 
@@ -26,11 +25,6 @@ class BuscarProducto(forms.Form):
         required=False,
         widget=forms.CheckboxSelectMultiple(),
         label="Estado"
-    )
-    buscarFecha = forms.DateField(
-        label="Fecha de Publicación",
-        required=False,
-        widget=forms.DateInput(format="%Y-%m-%d", attrs={"type": "date"})
     )
     buscarCategorias = forms.CharField(
         label= 'Categorías',
@@ -70,14 +64,6 @@ class ProductoForm(forms.Form):
         required=True,
         label="Estado"
     )
-    fecha_de_publicacion = forms.DateTimeField(
-        label="Fecha de Publicación",
-        required=True,
-        initial=timezone.now,
-        widget=forms.DateTimeInput(
-            format='%Y-%m-%dT%H:%M'
-        )
-    )
 
     def __init__(self, *args, **kwargs):
         super(ProductoForm, self).__init__(*args, **kwargs)
@@ -112,14 +98,6 @@ class CompraForm(forms.Form):
         ("DOS", "Dos años"),
     ]
     
-    fecha_compra = forms.DateTimeField(
-        required=True, 
-        label="Fecha de Compra", 
-        initial=timezone.now,
-        widget=forms.DateTimeInput(
-            format='%Y-%m-%dT%H:%M'
-        )
-    )
     total = forms.DecimalField(max_digits=10,
                                decimal_places=2,
                                required=True,
@@ -163,14 +141,6 @@ class ValoracionForm(forms.Form):
     comentario = forms.CharField(widget=forms.Textarea, 
                                  required=False, 
                                  label="Comentario")
-    fecha_valoracion = forms.DateTimeField(
-        required=True, 
-        label="Fecha de Valoración", 
-        initial=timezone.now,
-        widget=forms.DateTimeInput(
-            format='%Y-%m-%dT%H:%M'
-        )
-    )
 
     def __init__(self, *args, **kwargs):
         super(ValoracionForm, self).__init__(*args, **kwargs)
@@ -197,16 +167,6 @@ class ValoracionActualizarPuntuacionForm(forms.Form):
                                     required=True, 
                                     label="Puntuación")
     
-
-
-################################################
-################################################
-################################################
-#######################
-#  OTROS FORMULARIOS 
-
-################################################
-################################################
 
 
 class BuscarCalzado(forms.Form):
@@ -270,14 +230,38 @@ class CalzadoForm(forms.Form):
         super(CalzadoForm, self).__init__(*args, **kwargs)
         
         productosDisponibles = helper.obtener_productos()
-        self.fields['vendedor'] = forms.ChoiceField(
+        self.fields['producto'] = forms.ChoiceField(
             choices=productosDisponibles,
             required=True,
             widget=forms.Select(),
             label="Producto"
         )
 
-       
+class CalzadoActualizarMarcaForm(forms.Form):
+    MARCAS = [
+        ("NIKE", "Nike"),
+        ("ADID", "Adidas"),
+        ("PUMA", "Puma"),
+        ("RBK", "Reebok"),
+        ("NB", "New Balance"),
+        ("CLRK", "Clarks"),
+        ("GUCCI", "Gucci"),
+    ]
+    marca = forms.ChoiceField(
+        choices=MARCAS,
+        widget=forms.Select,
+        required=True,
+    )       
+################################################
+################################################
+################################################
+#######################
+#  OTROS FORMULARIOS 
+
+################################################
+################################################
+
+
     
 class BuscarMueble(forms.Form):
     buscarNombre = forms.CharField(required=False, label="Nombre")

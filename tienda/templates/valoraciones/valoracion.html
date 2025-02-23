@@ -1,7 +1,8 @@
+{% load bootstrap_icons %}
+
 <div class="card h-100 mb-4">
     <div class="card-body">
         <h2 class="card-title">Valoración de {{ valoracion.usuario.username }}</h2>
-        <h5 class="card-subtitle mb-2 text-muted">Fecha: {{ valoracion.fecha_valoracion }}</h5>
         <p class="card-text"><strong>Productos de compra asociada:</strong></p>
         <ul class="list-group list-group-flush">
             {% for producto in valoracion.compra.producto.all %}
@@ -13,11 +14,15 @@
                     No hay productos asociados a esta valoración.</li>
             {% endfor %}
         </ul>
-        <p class="card-text"><strong>Puntuación:</strong> {{ valoracion.puntuacion }} / 5</p>
+        <p class="card-text"><strong>Puntuación:</strong> {{ valoracion.puntuacion }} / 5
+            <button type="button" class="btn btn-outline-primary">
+                <a href="{% url 'valoraciones_actualizar_puntuacion' valoracion.id %}" class="text-decoration-none">
+                    <span>{% bs_icon 'pencil' %}</span>
+                </a>
+            </button>
+        </p>
         <p class="card-text"><strong>Comentario:</strong> {{ valoracion.comentario|default:"Sin comentarios" }}</p>
     </div>
-
-    {% load bootstrap_icons %}
     <div class="row btn-group p-3">
         <div class="mb-2">
             <button type="button" class="btn btn-outline-primary">

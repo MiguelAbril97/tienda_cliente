@@ -1,3 +1,4 @@
+{% load bootstrap_icons %}
 <div class="card">
     <div class="card-body">
         <h2 class="card-title">Calzado: {{ calzado.producto.nombre }}</h2>
@@ -6,7 +7,15 @@
         <p class="card-text"><strong>Precio:</strong> ${{ calzado.producto.precio }}</p>
         <p class="card-text"><strong>Descripción:</strong> {{ calzado.producto.descripcion }}</p>
         <p class="card-text"><strong>Talla:</strong> {{ calzado.talla }}</p>
-        <p class="card-text"><strong>Marca:</strong> {{ calzado.marca }}</p>
+        <p class="card-text"><strong>Marca:</strong> {{ calzado.marca }}
+            <div class="mb-2">
+                <button type="button" class="btn btn-outline-primary">
+                    <a href="{% url 'calzados_actualizar_marca' calzado.id %}" class="text-decoration-none">
+                        <span>{% bs_icon 'pencil' %}</span>
+                    </a>
+                </button>
+            </div>
+        </p>
         <p class="card-text"><strong>Color:</strong> {{ calzado.color }}</p>
         <p class="card-text"><strong>Material:</strong> {{ calzado.material }}</p>
         <h4 class="mt-3">Categorías:</h4>
@@ -17,5 +26,22 @@
                 </li>
             {% endfor %}
         </ul>
+    </div>
+    <div class="row btn-group p-3">
+        <div class="mb-2">
+            <button type="button" class="btn btn-outline-primary">
+                <a href="{% url 'calzados_editar' calzado.id %}" class="text-decoration-none">
+                    <span>{% bs_icon 'pencil' %}</span>
+                </a>
+            </button>
+        </div>
+        <div class="mb-2">
+            <form action="{% url 'calzados_eliminar' calzado.id %}" method="post">
+                {% csrf_token %}
+                <button class="btn btn-danger" onclick="return confirm('¿Seguro que quieres eliminar esta compra?')" type="submit">
+                    <span>{% bs_icon 'trash' %}</span>
+                </button>
+            </form>
+        </div>
     </div>
 </div>

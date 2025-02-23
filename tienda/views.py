@@ -6,7 +6,7 @@ from pathlib import Path
 from .forms import *
 import json
 from requests.exceptions import HTTPError
-from datetime import datetime
+from django.contrib import messages
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -52,6 +52,12 @@ def compras_listar(request):
     response = requests.get(peticion_v1('compras/listar'), headers=headers)
     compras = respuesta(response)
     return render(request, 'compras/lista.html', {'compras':compras})
+
+def calzado_listar(request):
+    headers = crear_cabecera()
+    response = request.get(peticion_v1('calzados'),headers=headers)
+    calzados = respuesta(response)
+    return render(request, 'calzados/lista.html',{'calzados':calzados})
 
 def producto_buscar_simple(request):
     formulario = BusquedaProductoSimple(request.GET)
@@ -114,6 +120,7 @@ def producto_crear(request):
                                     data=json.dumps(datos)
                                     )
             if(response.status_code == requests.codes.ok):
+                messages.success(request, 'Producto creado exitosamente.')
                 return redirect("lista_mejorada")
             else:
                 print(response.status_code)
@@ -150,8 +157,6 @@ def producto_editar(request, producto_id):
                                'descripcion': producto['descripcion'],
                                'precio': producto['precio'],
                                'estado': producto['estado'],
-                               'fecha_de_publicacion': datetime.strptime(
-                                   producto['fecha_de_publicacion'], '%Y-%m-%dT%H:%M:%S'),
                                 'vendedor': producto['vendedor']['id'],
                                 'categorias': [categoria['id'] for categoria in producto['categorias']]
                               }
@@ -167,6 +172,7 @@ def producto_editar(request, producto_id):
                                 data=json.dumps(datos)
                                 )
         if(response.status_code == requests.codes.ok):
+            messages.success(request, 'Producto editado exitosamente.')
             return redirect("lista_mejorada")
         else:
             if(response.status_code == 400):
@@ -195,10 +201,11 @@ def producto_actualizar_nombre(request, producto_id):
         formulario = ProductoActualizarNombreForm(request.POST)
         if formulario.is_valid():
             headers = crear_cabecera()
-            response = requests.put(peticion_v1('productos/actualizar/'+str(producto_id)), 
+            response = requests.patch(peticion_v1('productos/actualizar/'+str(producto_id)), 
                                     headers=headers, 
                                     data=json.dumps(formulario.data))
             if response.status_code == requests.codes.ok:
+                messages.success(request, 'Nombre del producto actualizado exitosamente.')
                 return redirect("lista_mejorada")
             else:
                 print(response.status_code)
@@ -213,6 +220,7 @@ def producto_eliminar(request, producto_id):
         response = requests.delete(peticion_v1('productos/eliminar/'+str(producto_id)), 
                                 headers=headers)
         if( response.status_code == requests.codes.ok):
+            messages.success(request, 'Producto eliminado exitosamente.')
             return redirect("lista_mejorada")
         else:
             print(response.status_code)
@@ -239,6 +247,7 @@ def compra_crear(request):
                                     data=json.dumps(datos)
                                     )
             if(response.status_code == requests.codes.ok):
+                messages.success(request, 'Compra creada exitosamente.')
                 return redirect("compras_listar")
             else:
                 print(response.status_code)
@@ -271,8 +280,6 @@ def compra_editar(request, compra_id):
     compra = helper.obtener_compra(compra_id)
     formulario = CompraForm(datosFormulario,
                             initial={
-                                'fecha_compra': datetime.strptime(
-                                    compra['fecha_compra'], '%Y-%m-%dT%H:%M:%S'),
                                 'total': compra['total'],
                                 'garantia': compra['garantia'],
                                 'comprador': helper.obtener_compradores(), 
@@ -281,14 +288,16 @@ def compra_editar(request, compra_id):
                         )
     if request.method == 'POST':
         formulario = CompraForm(request.POST)
-        datos = formulario.data.copy()
-        
+        datos = request.POST.copy()
+        datos['producto'] = request.POST.getlist('producto')
+        datos['comprador'] = request.POST.getlist('comprador')
         response = requests.put(
                                 peticion_v1('compras/editar/'+str(compra_id)),
                                 headers=crear_cabecera(),
                                 data=json.dumps(datos)
                                 )
         if(response.status_code == requests.codes.ok):
+            messages.success(request, 'Compra editada exitosamente.')
             return redirect("compras_listar")
         else:
             if(response.status_code == 400):
@@ -317,10 +326,11 @@ def compra_actualizar_garantia(request, compra_id):
         formulario = CompraActualizarGarantiaForm(request.POST)
         if formulario.is_valid():
             headers = crear_cabecera()
-            response = requests.put(peticion_v1('compras/actualizar/'+str(compra_id)), 
+            response = requests.patch(peticion_v1('compras/actualizar/'+str(compra_id)), 
                                     headers=headers, 
                                     data=json.dumps(formulario.data))
             if response.status_code == requests.codes.ok:
+                messages.success(request, 'Garantía de la compra actualizada exitosamente.')
                 return redirect("compras_listar")
             else:
                 print(response.status_code)
@@ -335,7 +345,8 @@ def compra_eliminar(request, compra_id):
         headers = crear_cabecera()
         response = requests.delete(peticion_v1('compras/eliminar/'+str(compra_id)), 
                                 headers=headers)
-        if( response.status_code == requests.codes.ok):
+        if(response.status_code == requests.codes.ok):
+            messages.success(request, 'Compra eliminada exitosamente.')
             return redirect("compras_listar")
         else:
             print(response.status_code)
@@ -357,6 +368,7 @@ def valoracion_crear(request):
                                     data=json.dumps(formulario.data)
                                     )
             if(response.status_code == requests.codes.ok):
+                messages.success(request, 'Valoración creada exitosamente.')
                 return redirect("valoraciones_listar")
             else:
                 print(response.status_code)
@@ -392,8 +404,6 @@ def valoracion_editar(request, valoracion_id):
                                 initial={
                                     'puntuacion': valoracion['puntuacion'],
                                     'comentario': valoracion['comentario'],
-                                    'fecha_valoracion': datetime.strptime(
-                                        valoracion['fecha_valoracion'], '%Y-%m-%dT%H:%M:%S'),
                                     'usuario': valoracion['usuario']['id'],
                                     'compra': valoracion['compra']['id']
                                 }
@@ -408,6 +418,7 @@ def valoracion_editar(request, valoracion_id):
                                 data=json.dumps(datos)
                                 )
         if(response.status_code == requests.codes.ok):
+            messages.success(request, 'Valoración editada exitosamente.')
             return redirect("valoraciones_listar")
         else:
             if(response.status_code == 400):
@@ -429,18 +440,19 @@ def valoracion_actualizar_puntuacion(request, valoracion_id):
     if request.method == "POST":
         datosFormulario = request.POST
         
-        valoracion = helper.obtener_valoracion(valoracion_id)
-        formulario = ValoracionActualizarPuntuacionForm(datosFormulario,
+    valoracion = helper.obtener_valoracion(valoracion_id)
+    formulario = ValoracionActualizarPuntuacionForm(datosFormulario,
                                                        initial={'puntuacion': valoracion['puntuacion']})
 
     if (request.method == 'POST'):
         formulario = ValoracionActualizarPuntuacionForm(request.POST)
         if formulario.is_valid():
             headers = crear_cabecera()
-            response = requests.put(peticion_v1('valoraciones/actualizar/'+str(valoracion_id)), 
+            response = requests.patch(peticion_v1('valoraciones/actualizar/'+str(valoracion_id)), 
                                     headers=headers, 
                                     data=json.dumps(formulario.data))
             if response.status_code == requests.codes.ok:
+                messages.success(request, 'Puntuación de la valoración actualizada exitosamente.')
                 return redirect("valoraciones_listar")
             else:
                 print(response.status_code)
@@ -455,6 +467,7 @@ def valoracion_eliminar(request, valoracion_id):
         response = requests.delete(peticion_v1('valoraciones/eliminar/'+str(valoracion_id)), 
                                 headers=headers)
         if(response.status_code == requests.codes.ok):
+            messages.success(request, 'Valoración eliminada exitosamente.')
             return redirect("valoraciones_listar")
         else:
             print(response.status_code)
@@ -464,18 +477,7 @@ def valoracion_eliminar(request, valoracion_id):
         return mi_error_500(request)
     return redirect("valoraciones_listar")
 
-################################################
-################################################
-##########  OTRAS VIEWS  #######################
-
-################################################
-################################################
-         
-def calzado_listar(request):
-    headers = crear_cabecera()
-    response = requests.get(peticion_v1('calzados'), headers=headers)
-    calzados = respuesta(response)
-    return render(request, 'calzados/lista.html', {'calzados':calzados})
+#Cuarta view
 
 def calzado_buscar(request):
     if len(request.GET) > 0:
@@ -487,7 +489,7 @@ def calzado_buscar(request):
                                     params=formulario.data)
             if response.status_code == requests.codes.ok:
                 calzados = respuesta(response)
-                return render(request, 'calzados_lista.html', {'calzados':calzados})
+                return render(request, 'calzados/lista.html', {'calzados':calzados})
             else:
                 print(response.status_code)
                 response.raise_for_status()
@@ -517,8 +519,9 @@ def calzado_crear(request):
                                     peticion_v1('calzados/crear'),
                                     headers=headers,
                                     data=json.dumps(formulario.data)
-            )
+                )
             if(response.status_code == requests.codes.ok):
+                messages.success(request, 'Calzado creado exitosamente.')
                 return redirect("calzado_listar")
             else:
                 print(response.status_code)
@@ -539,7 +542,96 @@ def calzado_crear(request):
     else:
         formulario = CalzadoForm(None)
     return render(request, 'calzados/crear.html', {"formulario":formulario})
+
+def calzado_editar(request, calzado_id):
+    datosFormulario = None
     
+    if request.method == "POST":
+        datosFormulario = request.POST
+    
+    calzado = helper.obtener_calzado(calzado_id)
+    formulario = CalzadoForm(datosFormulario,
+                             initial={
+                                 'nombre': calzado['nombre'],
+                                 'marca': calzado['marca'],
+                                 'talla': calzado['talla'],
+                                 'precio': calzado['precio'],
+                                 'color': calzado['color']
+                             }
+                            )
+    if request.method == 'POST':
+        formulario = CalzadoForm(request.POST)
+        datos = formulario.data.copy()
+        response = requests.put(
+                                peticion_v1('calzados/editar/'+str(calzado_id)),
+                                headers=crear_cabecera(),
+                                data=json.dumps(datos)
+                                )
+        if(response.status_code == requests.codes.ok):
+            messages.success(request, 'Calzado editado exitosamente.')
+            return redirect("calzados")
+        else:
+            if(response.status_code == 400):
+                errores = response.json()
+                for error in errores:
+                    formulario.add_error(error, errores[error])
+                return render(request, 
+                              'calzados/editar.html',
+                              {"formulario":formulario})
+            else:
+                return mi_error_500(request)
+    return render(request, 'calzados/editar.html', {"formulario":formulario, "calzado":calzado})
+
+def calzado_actualizar_marca(request, calzado_id):
+    datosFormulario = None
+    
+    if request.method == "POST":
+        datosFormulario = request.POST
+        
+    calzado = helper.obtener_calzado(calzado_id)
+    formulario = CalzadoActualizarMarcaForm(datosFormulario,
+                                            initial={'marca': calzado['marca']})
+
+    if (request.method == 'POST'):
+        formulario = CalzadoActualizarMarcaForm(request.POST)
+        if formulario.is_valid():
+            headers = crear_cabecera()
+            response = requests.patch(peticion_v1('calzados/actualizar/'+str(calzado_id)), 
+                                      headers=headers, 
+                                      data=json.dumps(formulario.data))
+            if response.status_code == requests.codes.ok:
+                messages.success(request, 'Marca del calzado actualizada exitosamente.')
+                return redirect("calzados")
+            else:
+                print(response.status_code)
+                response.raise_for_status()
+        else:
+            print(formulario.errors)
+    return render(request, 'calzados/actualizar_marca.html', {"formulario":formulario, "calzado":calzado})
+
+def calzado_eliminar(request, calzado_id):
+    try:
+        headers = crear_cabecera()
+        response = requests.delete(peticion_v1('calzados/eliminar/'+str(calzado_id)), 
+                                headers=headers)
+        if(response.status_code == requests.codes.ok):
+            messages.success(request, 'Calzado eliminado exitosamente.')
+            return redirect("calzado_listar")
+        else:
+            print(response.status_code)
+            response.raise_for_status()
+    except Exception as err:
+        print(f'Ocurrió un error: {err}')
+        return mi_error_500(request)
+    return redirect("calzado_listar")
+
+################################################
+################################################
+##########  OTRAS VIEWS  #######################
+
+################################################
+################################################
+          
 
 def consolas_listar(request):
     headers = crear_cabecera()
@@ -589,6 +681,7 @@ def consola_crear(request):
                                     data=json.dumps(formulario.data)
             )
             if(response.status_code == requests.codes.ok):
+                messages.success(request, 'Consola creada exitosamente.')
                 return redirect("consolas_listar")
             else:
                 print(response.status_code)
@@ -658,6 +751,7 @@ def mueble_crear(request):
                                     data=json.dumps(formulario.data)
             )
             if(response.status_code == requests.codes.ok):
+                messages.success(request, 'Mueble creado exitosamente.')
                 return redirect("muebles_listar")
             else:
                 print(response.status_code)

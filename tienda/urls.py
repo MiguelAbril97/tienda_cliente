@@ -29,11 +29,14 @@ urlpatterns = [
     path('valoraciones/actualizar/<int:valoracion_id>/',views.valoracion_actualizar_puntuacion,name='valoraciones_actualizar_puntuacion'),
     path('valoraciones/eliminar/<int:valoracion_id>/',views.valoracion_eliminar,name='valoraciones_eliminar'),
     
-    
-    ####OTRAS URLS
+    #Otro crud
     path('calzados/',views.calzado_listar,name='calzados'),
     path('calzados_crear/',views.calzado_crear,name='calzados_crear'),
     path('calzados/buscar/',views.calzado_buscar,name='calzados_buscar'),
+    path('calzados/editar/<int:calzado_id>/', views.calzado_editar, name='calzados_editar'),
+    path('calzados/actualizar/<int:calzado_id>/', views.calzado_actualizar_marca, name='calzados_actualizar_marca'),
+    path('calzados/eliminar/<int:calzado_id>/',views.calzado_eliminar,name="calzados_eliminar"),
+    ####OTRAS URLS
     path('consolas/',views.consolas_listar,name='consolas'),
     path('consolas/buscar/',views.consola_buscar,name='consolas_buscar'),
     path('consolas_crear/',views.consola_crear,name='consolas_crear'),
