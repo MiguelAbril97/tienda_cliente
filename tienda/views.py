@@ -4,6 +4,8 @@ import environ
 import os
 from pathlib import Path
 from .forms import *
+from .helper import helper
+
 import json
 from requests.exceptions import HTTPError
 from django.contrib import messages
@@ -13,9 +15,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'), True)
 env = environ.Env()
 
-# Create your views here.
-def index(request):
-    return render(request, 'index.html')
 
 def crear_cabecera():
     return {
@@ -28,6 +27,9 @@ def peticion_v1(direccion):
 
 def respuesta(objeto):
     return objeto.json()
+
+def index(request):
+    return render(request, 'index.html')
 
 def productos_listar_api(request):
     headers = crear_cabecera()
@@ -53,11 +55,87 @@ def compras_listar(request):
     compras = respuesta(response)
     return render(request, 'compras/lista.html', {'compras':compras})
 
-def calzado_listar(request):
-    headers = crear_cabecera()
-    response = request.get(peticion_v1('calzados'),headers=headers)
-    calzados = respuesta(response)
-    return render(request, 'calzados/lista.html',{'calzados':calzados})
+#### VIEWS DE USUARIOS ####
+
+def registrar_usuario(request):
+    if (request.method == "POST"):
+        try:
+            formulario = RegistroForm(request.POST)
+            if(formulario.is_valid()):
+                headers =  {
+                            "Content-Type": "application/json" 
+                        }
+                response = requests.post(
+                    'http://127.0.0.1:8000/api/v1/registrar/usuario',
+                    headers=headers,
+                    data=json.dumps(formulario.cleaned_data)
+                )
+                
+                if(response.status_code == requests.codes.ok):
+                    usuario = response.json()
+                    token_acceso = helper.obtener_token_session(
+                            formulario.cleaned_data.get("username"),
+                            formulario.cleaned_data.get("password1")
+                            )
+                    request.session["usuario"]=usuario
+                    request.session["token"] = token_acceso
+                    redirect("index")
+                else:
+                    print(response.status_code)
+                    response.raise_for_status()
+        except HTTPError as http_err:
+            print(f'Hubo un error en la petición: {http_err}')
+            if(response.status_code == 400):
+                errores = response.json()
+                for error in errores:
+                    formulario.add_error(error,errores[error])
+                return render(request, 
+                            'registration/signup.html',
+                            {"formulario":formulario})
+            else:
+                return mi_error_500(request)
+        except Exception as err:
+            print(f'Ocurrió un error: {err}')
+            return mi_error_500(request)
+            
+    else:
+        formulario = RegistroForm()
+    return render(request, 'registration/signup.html', {'formulario': formulario})
+
+
+def login(request):
+    if (request.method == "POST"):
+        formulario = LoginForm(request.POST)
+        try:
+            token_acceso = helper.obtener_token_session(
+                                formulario.data.get("usuario"),
+                                formulario.data.get("password")
+                                )
+            request.session["token"] = token_acceso
+            
+          
+            headers = {'Authorization': 'Bearer '+token_acceso} 
+            response = requests.get('http://127.0.0.1:8000/api/v1/usuario/token/'+token_acceso,headers=headers)
+            usuario = response.json()
+            request.session["usuario"] = usuario
+            
+            return  redirect("index")
+        except Exception as excepcion:
+            print(f'Hubo un error en la petición: {excepcion}')
+            formulario.add_error("usuario",excepcion)
+            formulario.add_error("password",excepcion)
+            return render(request, 
+                            'registration/login.html',
+                            {"form":formulario})
+    else:  
+        formulario = LoginForm()
+    return render(request, 'registration/login.html', {'form': formulario})
+
+def logout(request):
+    del request.session['token']
+    return redirect('index')
+
+####otras views####
 
 def producto_buscar_simple(request):
     formulario = BusquedaProductoSimple(request.GET)
@@ -476,302 +554,6 @@ def valoracion_eliminar(request, valoracion_id):
         print(f'Ocurrió un error: {err}')
         return mi_error_500(request)
     return redirect("valoraciones_listar")
-
-#Cuarta view
-
-def calzado_buscar(request):
-    if len(request.GET) > 0:
-        formulario = BuscarCalzado(request.GET)
-        try:
-            headers = crear_cabecera()
-            response = requests.get(peticion_v1('calzados/buscar'), 
-                                    headers=headers, 
-                                    params=formulario.data)
-            if response.status_code == requests.codes.ok:
-                calzados = respuesta(response)
-                return render(request, 'calzados/lista.html', {'calzados':calzados})
-            else:
-                print(response.status_code)
-                response.raise_for_status()
-        except HTTPError as http_err:
-            print(f'Hubo un error en la petición: {http_err}')
-            if response and response.status_code == 400:
-                errores = response.json()
-                for error in errores:
-                    formulario.add_error(error, errores[error])
-                return render(request, 'calzados/buscar.html',
-                              {"formulario":formulario, "errores":errores})
-            else:
-                return mi_error_500(request)
-        except Exception as err:
-            print(f'Ocurrió un error: {err}')
-            return mi_error_500(request)
-    else:
-        formulario = BuscarCalzado(None)
-    return render(request, 'calzados/buscar.html', {"formulario":formulario})
-
-def calzado_crear(request):
-    if (request.method == 'POST'):
-        try:
-            formulario = CalzadoForm(request.POST)
-            headers = crear_cabecera()
-            response = requests.post(
-                                    peticion_v1('calzados/crear'),
-                                    headers=headers,
-                                    data=json.dumps(formulario.data)
-                )
-            if(response.status_code == requests.codes.ok):
-                messages.success(request, 'Calzado creado exitosamente.')
-                return redirect("calzado_listar")
-            else:
-                print(response.status_code)
-                response.raise_for_status()
-        except HTTPError as http_err:
-            print(f'Hubo un error en la petición: {http_err}')
-            if(response.status_code == 400):
-                errores = response.json()
-                for error in errores:
-                    formulario.add_error(error,errores[error])
-                return render(request, 
-                            'calzados/crear.html',
-                            {"formulario":formulario})
-            else:
-                return mi_error_500(request)
-        except Exception as err:
-            return mi_error_500(request)
-    else:
-        formulario = CalzadoForm(None)
-    return render(request, 'calzados/crear.html', {"formulario":formulario})
-
-def calzado_editar(request, calzado_id):
-    datosFormulario = None
-    
-    if request.method == "POST":
-        datosFormulario = request.POST
-    
-    calzado = helper.obtener_calzado(calzado_id)
-    formulario = CalzadoForm(datosFormulario,
-                             initial={
-                                 'nombre': calzado['nombre'],
-                                 'marca': calzado['marca'],
-                                 'talla': calzado['talla'],
-                                 'precio': calzado['precio'],
-                                 'color': calzado['color']
-                             }
-                            )
-    if request.method == 'POST':
-        formulario = CalzadoForm(request.POST)
-        datos = formulario.data.copy()
-        response = requests.put(
-                                peticion_v1('calzados/editar/'+str(calzado_id)),
-                                headers=crear_cabecera(),
-                                data=json.dumps(datos)
-                                )
-        if(response.status_code == requests.codes.ok):
-            messages.success(request, 'Calzado editado exitosamente.')
-            return redirect("calzados")
-        else:
-            if(response.status_code == 400):
-                errores = response.json()
-                for error in errores:
-                    formulario.add_error(error, errores[error])
-                return render(request, 
-                              'calzados/editar.html',
-                              {"formulario":formulario})
-            else:
-                return mi_error_500(request)
-    return render(request, 'calzados/editar.html', {"formulario":formulario, "calzado":calzado})
-
-def calzado_actualizar_marca(request, calzado_id):
-    datosFormulario = None
-    
-    if request.method == "POST":
-        datosFormulario = request.POST
-        
-    calzado = helper.obtener_calzado(calzado_id)
-    formulario = CalzadoActualizarMarcaForm(datosFormulario,
-                                            initial={'marca': calzado['marca']})
-
-    if (request.method == 'POST'):
-        formulario = CalzadoActualizarMarcaForm(request.POST)
-        if formulario.is_valid():
-            headers = crear_cabecera()
-            response = requests.patch(peticion_v1('calzados/actualizar/'+str(calzado_id)), 
-                                      headers=headers, 
-                                      data=json.dumps(formulario.data))
-            if response.status_code == requests.codes.ok:
-                messages.success(request, 'Marca del calzado actualizada exitosamente.')
-                return redirect("calzados")
-            else:
-                print(response.status_code)
-                response.raise_for_status()
-        else:
-            print(formulario.errors)
-    return render(request, 'calzados/actualizar_marca.html', {"formulario":formulario, "calzado":calzado})
-
-def calzado_eliminar(request, calzado_id):
-    try:
-        headers = crear_cabecera()
-        response = requests.delete(peticion_v1('calzados/eliminar/'+str(calzado_id)), 
-                                headers=headers)
-        if(response.status_code == requests.codes.ok):
-            messages.success(request, 'Calzado eliminado exitosamente.')
-            return redirect("calzado_listar")
-        else:
-            print(response.status_code)
-            response.raise_for_status()
-    except Exception as err:
-        print(f'Ocurrió un error: {err}')
-        return mi_error_500(request)
-    return redirect("calzado_listar")
-
-################################################
-################################################
-##########  OTRAS VIEWS  #######################
-
-################################################
-################################################
-          
-
-def consolas_listar(request):
-    headers = crear_cabecera()
-    response = requests.get(peticion_v1('consolas'), headers=headers)
-    consolas = respuesta(response)
-    return render(request, 'consolas/lista.html', {'consolas':consolas})
-
-def consola_buscar(request):
-    if len(request.GET) > 0:
-        formulario = BuscarConsola(request.GET)
-        try:
-            headers = crear_cabecera()
-            response = requests.get(peticion_v1('consolas/buscar'), 
-                                    headers=headers, 
-                                    params=formulario.data)
-            if response.status_code == requests.codes.ok:
-                consolas = respuesta(response)
-                return render(request, 'consolas/lista.html', {'consolas':consolas})
-            else:
-                print(response.status_code)
-                response.raise_for_status()
-        except HTTPError as http_err:
-            print(f'Hubo un error en la petición: {http_err}')
-            if response and response.status_code == 400:
-                errores = response.json()
-                for error in errores:
-                    formulario.add_error(error, errores[error])
-                return render(request, 'consolas/buscar.html', 
-                              {"formulario":formulario, "errores":errores})
-            else:
-                return mi_error_500(request)
-        except Exception as err:
-            print(f'Ocurrió un error: {err}')
-            return mi_error_500(request)
-    else:
-        formulario = BuscarConsola(None)
-    return render(request, 'consolas/buscar.html', {"formulario":formulario})
-
-def consola_crear(request):
-    if (request.method == 'POST'):
-        try:
-            formulario = ConsolaForm(request.POST)
-            headers = crear_cabecera()
-            response = requests.post(
-                                    peticion_v1('consolas/crear'),
-                                    headers=headers,
-                                    data=json.dumps(formulario.data)
-            )
-            if(response.status_code == requests.codes.ok):
-                messages.success(request, 'Consola creada exitosamente.')
-                return redirect("consolas_listar")
-            else:
-                print(response.status_code)
-                response.raise_for_status()
-        except HTTPError as http_err:
-            print(f'Hubo un error en la petición: {http_err}')
-            if(response.status_code == 400):
-                errores = response.json()
-                for error in errores:
-                    formulario.add_error(error,errores[error])
-                return render(request, 
-                            'consolas/crear.html',
-                            {"formulario":formulario})
-            else:
-                return mi_error_500(request)
-        except Exception as err:
-            return mi_error_500(request)
-    else:
-        formulario = ConsolaForm(None)
-    return render(request, 'consolas/crear.html', {"formulario":formulario})
-
-def muebles_listar(request):
-    headers = crear_cabecera()
-    response = requests.get(peticion_v1('muebles'), headers=headers)
-    muebles = respuesta(response)
-    return render(request, 'muebles/lista.html', {'muebles':muebles})
-
-def mueble_buscar(request):
-    if len(request.GET) > 0:
-        formulario = BuscarMueble(request.GET)
-        try:
-            headers = crear_cabecera()
-            response = requests.get(peticion_v1('muebles/buscar'), 
-                                    headers=headers, 
-                                    params=formulario.data)
-            if response.status_code == requests.codes.ok:
-                muebles = respuesta(response)
-                return render(request, 'muebles/lista.html', {'muebles':muebles})
-            else:
-                print(response.status_code)
-                response.raise_for_status()
-        except HTTPError as http_err:
-            print(f'Hubo un error en la petición: {http_err}')
-            if response and response.status_code == 400:
-                errores = response.json()
-                for error in errores:
-                    formulario.add_error(error, errores[error])
-                return render(request, 'muebles/buscar.html', 
-                              {"formulario":formulario, "errores":errores})
-            else:
-                return mi_error_500(request)
-        except Exception as err:
-            print(f'Ocurrió un error: {err}')
-            return mi_error_500(request)
-    else:
-        formulario = BuscarMueble(None)
-    return render(request, 'muebles/buscar.html', {"formulario":formulario})
-
-def mueble_crear(request):
-    if (request.method == 'POST'):
-        try:
-            formulario = MuebleForm(request.POST)
-            headers = crear_cabecera()
-            response = requests.post(
-                                    peticion_v1('muebles/crear'),
-                                    headers=headers,
-                                    data=json.dumps(formulario.data)
-            )
-            if(response.status_code == requests.codes.ok):
-                messages.success(request, 'Mueble creado exitosamente.')
-                return redirect("muebles_listar")
-            else:
-                print(response.status_code)
-                response.raise_for_status()
-        except HTTPError as http_err:
-            print(f'Hubo un error en la petición: {http_err}')
-            if(response.status_code == 400):
-                errores = response.json()
-                for error in errores:
-                    formulario.add_error(error,errores[error])
-                return render(request, 
-                            'muebles/crear.html',
-                            {"formulario":formulario})
-            else:
-                return mi_error_500(request)
-        except Exception as err:
-            return mi_error_500(request)
-    else:
-        formulario = MuebleForm(None)
-    return render(request, 'muebles/crear.html', {"formulario":formulario})
 
 def mi_error_400(request, exception=None):
     return render(request, 'errores/400.html', None, None, 400)

@@ -1,6 +1,9 @@
 from django import forms
 from django.contrib.auth.models import AbstractUser
 from .helper import *
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+
 
 class BusquedaProductoSimple(forms.Form):
     textoBusqueda = forms.CharField(required=True)
@@ -168,186 +171,33 @@ class ValoracionActualizarPuntuacionForm(forms.Form):
                                     label="Puntuación")
     
 
+##################################################
+##################################################
+########   USUARIO  #########################
 
-class BuscarCalzado(forms.Form):
-    
-    buscarNombre = forms.CharField(required=False, label="Nombre")
-    MARCAS = [
-        ("''","Cualquiera"),
-        ("NIKE", "Nike"),
-        ("ADID", "Adidas"),
-        ("PUMA", "Puma"),
-        ("RBK", "Reebok"),
-        ("NB", "New Balance"),
-        ("CLRK", "Clarks"),
-        ("GUCCI", "Gucci"),
-    ]
-    buscarTalla = forms.IntegerField(min_value=1, max_value=50, required=False, label="Talla")
-    buscarMarca = forms.ChoiceField(
-        choices=MARCAS,
-        required=False,
-        label="Marca",
-        widget=forms.RadioSelect(),
-        initial="''"
+class RegistroForm(UserCreationForm):
+    roles = (
+        (2,'compradores'),
+        (3,'vendedores')
     )
-    buscarColor = forms.CharField(max_length=20, required=False, label="Color")
-    buscarMaterial = forms.CharField(max_length=30, required=False, label="Material")
-    buscarPrecioMax = forms.DecimalField(
-        required=False,
-        label="Precio Máximo",
-        min_value=0,
-        widget=forms.NumberInput()
-    )
-
-class CalzadoForm(forms.Form):
-    MARCAS = [
-        ("NIKE", "Nike"),
-        ("ADID", "Adidas"),
-        ("PUMA", "Puma"),
-        ("RBK", "Reebok"),
-        ("NB", "New Balance"),
-        ("CLRK", "Clarks"),
-        ("GUCCI", "Gucci"),
-    ]
-    
-    talla = forms.CharField(max_length=2,
-                            required=True, 
-                            label="Talla")
-    marca = forms.ChoiceField(
-        choices=MARCAS,
-        widget=forms.Select,
-        required=True,
-    )
-    color = forms.CharField(max_length=20, 
-                            label="Color")
-    
-    material = forms.CharField(max_length=30,
-                               required=True, 
-                                label="Material"
-                                )
-    
-    def __init__(self, *args, **kwargs):
-        super(CalzadoForm, self).__init__(*args, **kwargs)
+    rol = forms.ChoiceField(choices=roles)
+    telefono = forms.CharField(max_length=9, label="Teléfono")
+    direccion = forms.CharField(max_length=150, label="Dirección")
+    nombre = forms.CharField(max_length=60, required=False, label="Nombre")
+    apellidos = forms.CharField(max_length=60, required=False, label="Apellidos")
+    razonSocial = forms.CharField(max_length=150, required=False, label="Razón Social")
+    direccionFiscal = forms.CharField(max_length=150, required=False, label="Dirección Fiscal. Dejelo en blanco si es igual a su dirección")
+    class Meta:
+        model = User
+        fields = ('rol', 'username', 'email', 'telefono', 'direccion', 
+                  'password1', 'password2',
+                  'nombre', 'apellidos', 
+                  'razonSocial', 'direccionFiscal')
+        widgets = {
+            'email': forms.EmailInput(),
+        }
         
-        productosDisponibles = helper.obtener_productos()
-        self.fields['producto'] = forms.ChoiceField(
-            choices=productosDisponibles,
-            required=True,
-            widget=forms.Select(),
-            label="Producto"
-        )
-
-class CalzadoActualizarMarcaForm(forms.Form):
-    MARCAS = [
-        ("NIKE", "Nike"),
-        ("ADID", "Adidas"),
-        ("PUMA", "Puma"),
-        ("RBK", "Reebok"),
-        ("NB", "New Balance"),
-        ("CLRK", "Clarks"),
-        ("GUCCI", "Gucci"),
-    ]
-    marca = forms.ChoiceField(
-        choices=MARCAS,
-        widget=forms.Select,
-        required=True,
-    )       
-################################################
-################################################
-################################################
-#######################
-#  OTROS FORMULARIOS 
-
-################################################
-################################################
-
-
+class LoginForm(forms.Form):
+    usuario = forms.CharField()
+    password = forms.CharField(widget=forms.PasswordInput())
     
-class BuscarMueble(forms.Form):
-    buscarNombre = forms.CharField(required=False, label="Nombre")
-    buscarMaterial = forms.CharField(required=False, label="Material")
-    buscarAnchoMin = forms.FloatField(
-        required=False,
-        label="Ancho mínimo",
-        widget=forms.NumberInput()
-    )
-    buscarAnchoMax = forms.FloatField(
-        required=False,
-        label="Ancho máximo",
-        widget=forms.NumberInput()
-    )
-    buscarAltoMin = forms.FloatField(
-        required=False,
-        label="Alto mínimo",
-        widget=forms.NumberInput()
-    )
-    buscarAltoMax = forms.FloatField(
-        required=False,
-        label="Alto máximo",
-        widget=forms.NumberInput()
-    )
-    buscarProfundidadMin = forms.FloatField(
-        required=False,
-        label="Profundidad mínima",
-        widget=forms.NumberInput()
-    )
-    buscarProfundidadMax = forms.FloatField(
-        required=False,
-        label="Profundidad máxima",
-        widget=forms.NumberInput()
-    )
-    buscarPesoMax = forms.IntegerField(
-        required=False,
-        label="Peso máximo",
-        widget=forms.NumberInput()
-    )
-    
-class MuebleForm(forms.Form):
-    material = forms.CharField(max_length=30, required=True, label="Material")
-    ancho = forms.FloatField(required=True, label="Ancho")
-    alto = forms.FloatField(required=True, label="Alto")
-    profundidad = forms.FloatField(required=True, label="Profundidad")
-    peso = forms.IntegerField(required=True, label="Peso")
-
-    def __init__(self, *args, **kwargs):
-        super(MueblesForm, self).__init__(*args, **kwargs)
-        productosDisponibles = helper.obtener_productos()
-        self.fields['producto'] = forms.ChoiceField(
-            choices=productosDisponibles,
-            required=True,
-            widget=forms.Select(),
-            label="Producto"
-        )    
-
-
-
-class BuscarConsola(forms.Form):
-    buscarNombre = forms.CharField(required=False, label="Nombre")
-    buscarModelo = forms.CharField(required=False, label="Modelo")
-    buscarColor = forms.CharField(required=False, label="Color")
-    buscarMemoria = forms.IntegerField(
-        required=False,
-        label="Memoria",
-        widget=forms.NumberInput()
-    )
-    buscarPrecioMax = forms.DecimalField(
-        required=False,
-        label="Precio Máximo",
-        min_value=0,
-        widget=forms.NumberInput(attrs={'placeholder': '1000.00'})
-    )
-
-class ConsolaForm(forms.Form):
-    modelo = forms.CharField(max_length=50, required=True, label="Modelo")
-    color = forms.CharField(max_length=20, required=True, label="Color")
-    memoria = forms.CharField(max_length=20, required=True, label="Memoria")
-
-    def __init__(self, *args, **kwargs):
-        super(ConsolasForm, self).__init__(*args, **kwargs)
-        productosDisponibles = helper.obtener_productos()
-        self.fields['producto'] = forms.ChoiceField(
-            choices=productosDisponibles,
-            required=True,
-            widget=forms.Select(),
-            label="Producto"
-        )
