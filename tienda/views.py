@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 from .forms import *
 from .helper import helper
+from .cliente_api import cliente_api
 
 import json
 from requests.exceptions import HTTPError
@@ -79,7 +80,7 @@ def registrar_usuario(request):
                             )
                     request.session["usuario"]=usuario
                     request.session["token"] = token_acceso
-                    redirect("index")
+                    return redirect("index")
                 else:
                     print(response.status_code)
                     response.raise_for_status()
@@ -102,7 +103,6 @@ def registrar_usuario(request):
         formulario = RegistroForm()
     return render(request, 'registration/signup.html', {'formulario': formulario})
 
-
 def login(request):
     if (request.method == "POST"):
         formulario = LoginForm(request.POST)
@@ -118,7 +118,6 @@ def login(request):
             response = requests.get('http://127.0.0.1:8000/api/v1/usuario/token/'+token_acceso,headers=headers)
             usuario = response.json()
             request.session["usuario"] = usuario
-            
             return  redirect("index")
         except Exception as excepcion:
             print(f'Hubo un error en la petición: {excepcion}')

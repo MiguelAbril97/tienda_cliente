@@ -1,79 +1,94 @@
 {% load django_bootstrap5 %}
 {% bootstrap_css %}
-<div>
-    <form class="d-flex" action="{% url 'productos_buscar_simple' %}"role="search" method="GET">
-        <input name="textoBusqueda" class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-light btn-outline-dark" type="submit">Search</button>
-      </form>
-    </form>
-</div>
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <a class="nav-link" href="{% url 'productos_crear' %}">Crear Producto</a>
-                    </h5>
+<html>
+    <div>
+        {% if request.session.token %}
+        <p>
+          Nombre Usuario: {{ request.user.username }}
+        </p>
+        <a class="btn btn-danger" href="{% url 'logout' %}">Logout</a>
+        {% else %}
+            <!-- Si no, mostramos Login y Registrar -->
+            <a class="btn btn-primary me-2" href="{% url 'login' %}">Login</a>
+            <a class="btn btn-success" href="{% url 'registrar_usuario' %}">Registrar</a>
+        {% endif %}
+    </div>
+    <div>
+        <form class="d-flex" action="{% url 'productos_buscar_simple' %}"role="search" method="GET">
+            <input name="textoBusqueda" class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-light btn-outline-dark" type="submit">Search</button>
+          </form>
+        </form>
+    </div>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a class="nav-link" href="{% url 'productos_crear' %}">Crear Producto</a>
+                        </h5>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <a class="nav-link" href="{% url 'lista_mejorada' %}">Lista Mejorada</a>
-                    </h5>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a class="nav-link" href="{% url 'lista_mejorada' %}">Lista Mejorada</a>
+                        </h5>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <a class="nav-link" href="{% url 'productos_buscar' %}">Buscar Productos</a>
-                    </h5>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a class="nav-link" href="{% url 'productos_buscar' %}">Buscar Productos</a>
+                        </h5>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <a class="nav-link" href="{% url 'compras_listar' %}">Compras</a>
-                    </h5>
-                </div>
-            </div>
-        </div>
 
-        <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <a class="nav-link" href="{% url 'compras_crear' %}">Crear compra</a>
-                    </h5>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a class="nav-link" href="{% url 'compras_listar' %}">Compras</a>
+                        </h5>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <a class="nav-link" href="{% url 'valoraciones_listar' %}">Valoraciones</a>
-                    </h5>
-                </div>
-            </div>
-        </div>
 
-        <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <a class="nav-link" href="{% url 'valoraciones_crear' %}">Crear valoracion</a>
-                    </h5>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a class="nav-link" href="{% url 'compras_crear' %}">Crear compra</a>
+                        </h5>
+                    </div>
                 </div>
             </div>
-        </div>
-</div>
+
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a class="nav-link" href="{% url 'valoraciones_listar' %}">Valoraciones</a>
+                        </h5>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a class="nav-link" href="{% url 'valoraciones_crear' %}">Crear valoracion</a>
+                        </h5>
+                    </div>
+                </div>
+            </div>
+            {% bootstrap_javascript %}
+    </div>
+</html>
