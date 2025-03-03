@@ -17,9 +17,10 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'), True)
 env = environ.Env()
 
 
-def crear_cabecera():
+def crear_cabecera(request):
+    token = request.session.get('token')
     return {
-        'Authorization': 'Bearer ' + env('TOKEN_ACCESO'),
+        'Authorization': 'Bearer ' + token,
         "Content-Type": "application/json"
     }
 
@@ -33,25 +34,25 @@ def index(request):
     return render(request, 'index.html')
 
 def productos_listar_api(request):
-    headers = crear_cabecera()
+    headers = crear_cabecera(request)
     response = requests.get(peticion_v1('productos'), headers=headers)
     productos = respuesta(response)
     return render(request, 'productos/lista_basica.html', {'productos':productos})
 
 def productos_listar_mejorado_api(request):
-    headers = crear_cabecera()
+    headers = crear_cabecera(request)
     response = requests.get(peticion_v1('productos-mejorado'), headers=headers)
     productos = respuesta(response)
     return render(request, 'productos/lista.html', {'productos':productos})
 
 def valoraciones_listar(request):
-    headers = crear_cabecera()
+    headers = crear_cabecera(request)
     response = requests.get(peticion_v1('valoraciones/listar'), headers=headers)
     valoraciones = respuesta(response)
     return render(request, 'valoraciones/lista.html', {'valoraciones':valoraciones})
 
 def compras_listar(request):
-    headers = crear_cabecera()
+    headers = crear_cabecera(request)
     response = requests.get(peticion_v1('compras/listar'), headers=headers)
     compras = respuesta(response)
     return render(request, 'compras/lista.html', {'compras':compras})
@@ -140,7 +141,7 @@ def producto_buscar_simple(request):
     formulario = BusquedaProductoSimple(request.GET)
     
     if formulario.is_valid():
-        headers = crear_cabecera()
+        headers = crear_cabecera(request)
         response = requests.get(peticion_v1('productos/buscar_simple'), 
                                 headers=headers, 
                                 params={'textoBusqueda':formulario.data.get("textoBusqueda")})
@@ -156,7 +157,7 @@ def producto_buscar(request):
     if len(request.GET) > 0:
         formulario = BuscarProducto(request.GET)
         try:
-            headers = crear_cabecera()
+            headers = crear_cabecera(request)
             response = requests.get(peticion_v1('productos/buscar_avanzada'), 
                                     headers=headers, 
                                     params=formulario.data)
@@ -188,7 +189,7 @@ def producto_crear(request):
     if (request.method == 'POST'):
         try:
             formulario = ProductoForm(request.POST)
-            headers = crear_cabecera()
+            headers = crear_cabecera(request)
             datos = formulario.data.copy()
             datos['categorias'] = request.POST.getlist('categorias')          
             response = requests.post(
@@ -245,7 +246,7 @@ def producto_editar(request, producto_id):
           
         response = requests.put(
                                 peticion_v1('productos/editar/'+str(producto_id)),
-                                headers=crear_cabecera(),
+                                headers=crear_cabecera(request),
                                 data=json.dumps(datos)
                                 )
         if(response.status_code == requests.codes.ok):
@@ -277,7 +278,7 @@ def producto_actualizar_nombre(request, producto_id):
     if (request.method == 'POST'):
         formulario = ProductoActualizarNombreForm(request.POST)
         if formulario.is_valid():
-            headers = crear_cabecera()
+            headers = crear_cabecera(request)
             response = requests.patch(peticion_v1('productos/actualizar/'+str(producto_id)), 
                                     headers=headers, 
                                     data=json.dumps(formulario.data))
@@ -293,7 +294,7 @@ def producto_actualizar_nombre(request, producto_id):
 
 def producto_eliminar(request, producto_id):
     try:
-        headers = crear_cabecera()
+        headers = crear_cabecera(request)
         response = requests.delete(peticion_v1('productos/eliminar/'+str(producto_id)), 
                                 headers=headers)
         if( response.status_code == requests.codes.ok):
@@ -313,7 +314,7 @@ def compra_crear(request):
     if (request.method == 'POST'):    
         try:
             formulario = CompraForm(request.POST)
-            headers = crear_cabecera()
+            headers = crear_cabecera(request)
             datos = formulario.data.copy()
             
             datos['producto'] = request.POST.getlist('producto')
@@ -370,7 +371,7 @@ def compra_editar(request, compra_id):
         datos['comprador'] = request.POST.getlist('comprador')
         response = requests.put(
                                 peticion_v1('compras/editar/'+str(compra_id)),
-                                headers=crear_cabecera(),
+                                headers=crear_cabecera(request),
                                 data=json.dumps(datos)
                                 )
         if(response.status_code == requests.codes.ok):
@@ -402,7 +403,7 @@ def compra_actualizar_garantia(request, compra_id):
     if (request.method == 'POST'):
         formulario = CompraActualizarGarantiaForm(request.POST)
         if formulario.is_valid():
-            headers = crear_cabecera()
+            headers = crear_cabecera(request)
             response = requests.patch(peticion_v1('compras/actualizar/'+str(compra_id)), 
                                     headers=headers, 
                                     data=json.dumps(formulario.data))
@@ -419,7 +420,7 @@ def compra_actualizar_garantia(request, compra_id):
 
 def compra_eliminar(request, compra_id):
     try:
-        headers = crear_cabecera()
+        headers = crear_cabecera(request)
         response = requests.delete(peticion_v1('compras/eliminar/'+str(compra_id)), 
                                 headers=headers)
         if(response.status_code == requests.codes.ok):
@@ -438,7 +439,7 @@ def valoracion_crear(request):
     if(request.method == 'POST'):
         try:
             formulario = ValoracionForm(request.POST)
-            headers = crear_cabecera()
+            headers = crear_cabecera(request)
             response = requests.post(
                                     peticion_v1('valoraciones/crear'),
                                     headers=headers,
@@ -491,7 +492,7 @@ def valoracion_editar(request, valoracion_id):
         datos = formulario.data.copy()
         response = requests.put(
                                 peticion_v1('valoraciones/editar/'+str(valoracion_id)),
-                                headers=crear_cabecera(),
+                                headers=crear_cabecera(request),
                                 data=json.dumps(datos)
                                 )
         if(response.status_code == requests.codes.ok):
@@ -524,7 +525,7 @@ def valoracion_actualizar_puntuacion(request, valoracion_id):
     if (request.method == 'POST'):
         formulario = ValoracionActualizarPuntuacionForm(request.POST)
         if formulario.is_valid():
-            headers = crear_cabecera()
+            headers = crear_cabecera(request)
             response = requests.patch(peticion_v1('valoraciones/actualizar/'+str(valoracion_id)), 
                                     headers=headers, 
                                     data=json.dumps(formulario.data))
@@ -540,7 +541,7 @@ def valoracion_actualizar_puntuacion(request, valoracion_id):
 
 def valoracion_eliminar(request, valoracion_id):
     try:
-        headers = crear_cabecera()
+        headers = crear_cabecera(request)
         response = requests.delete(peticion_v1('valoraciones/eliminar/'+str(valoracion_id)), 
                                 headers=headers)
         if(response.status_code == requests.codes.ok):
