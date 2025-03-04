@@ -69,17 +69,18 @@ class ProductoForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request")
         super(ProductoForm, self).__init__(*args, **kwargs)
         
-        vendedoresDisponibles = helper.obtener_vendedores()
+        vendedoresDisponibles = helper.obtener_vendedor(self.request.session['usuario']['id'], self.request)
         self.fields['vendedor'] = forms.ChoiceField(
             choices=vendedoresDisponibles,
             required=True,
-            widget=forms.Select(),
-            label="Vendedor"
+            initial=vendedoresDisponibles[0],
+            label="Vendedor",
         )
 
-        categoriasDisponibles = helper.obtener_categorias()
+        categoriasDisponibles = helper.obtener_categorias(self.request)
         self.fields['categorias'] = forms.MultipleChoiceField(
             choices=categoriasDisponibles,
             required=True,

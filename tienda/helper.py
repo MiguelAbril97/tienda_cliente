@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 import environ
 import requests
+from. import views
+import json
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -28,12 +30,12 @@ class helper:
             raise Exception(respuesta.get("error_description"))
 
     # OBTENER LISTAS #
-    def obtener_categorias():
-        headers = {'Authorization': 'Bearer ' + env('TOKEN_ACCESO')}
+    def obtener_categorias(request):
+        headers = views.crear_cabecera(request)
         response = requests.get('http://127.0.0.1:8000/api/v1/categorias/', headers=headers)
         categorias = response.json()
 
-        lista_categorias = [("", "Ninguna")]
+        lista_categorias = []
         for categoria in categorias:
             lista_categorias.append((categoria['id'], categoria['nombre']))
         return lista_categorias
@@ -58,8 +60,8 @@ class helper:
             lista_compradores.append((comprador['id'], comprador['usuario']['username']))
         return lista_compradores
 
-    def obtener_productos():
-        headers = {'Authorization': 'Bearer ' + env('TOKEN_ACCESO')}
+    def obtener_productos(request):
+        headers = views.crear_cabecera(request)
         response = requests.get('http://127.0.0.1:8000/api/v1/productos-mejorado/', headers=headers)
         productos = response.json()
 
@@ -68,8 +70,8 @@ class helper:
             lista_productos.append((producto['id'], producto['nombre']))
         return lista_productos
 
-    def obtener_compras():
-        headers = {'Authorization': 'Bearer ' + env('TOKEN_ACCESO')}
+    def obtener_compras(request):
+        headers = views.crear_cabecera(request)
         response = requests.get('http://127.0.0.1:8000/api/v1/compras/listar/', headers=headers)
         compras = response.json()
 
@@ -80,8 +82,17 @@ class helper:
         return lista_compras
 
     # OBTENER UN SOLO ELEMENTO #
-    def obtener_producto(id):
-        headers = {'Authorization': 'Bearer ' + env('TOKEN_ACCESO')}
+    def obtener_vendedor(id, request):
+        headers = views.crear_cabecera(request)
+        response = requests.get(f'http://127.0.0.1:8000/api/v1/vendedores/'+str(id)+'/', headers=headers)
+        vendedores = response.json()
+        lista_vendedor = []
+        
+        lista_vendedor.append((vendedores['usuario']['id'],vendedores['usuario']['username']))
+        return lista_vendedor
+    
+    def obtener_producto(id, request):
+        headers = views.crear_cabecera(request)
         response = requests.get(f'http://127.0.0.1:8000/api/v1/productos/'+str(id)+'/', headers=headers)
         producto = response.json()
         return producto

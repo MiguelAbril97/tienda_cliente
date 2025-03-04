@@ -188,7 +188,7 @@ def producto_buscar(request):
 def producto_crear(request):
     if (request.method == 'POST'):
         try:
-            formulario = ProductoForm(request.POST)
+            formulario = ProductoForm(request.POST, request=request)
             headers = crear_cabecera(request)
             datos = formulario.data.copy()
             datos['categorias'] = request.POST.getlist('categorias')          
@@ -218,7 +218,7 @@ def producto_crear(request):
             print(f'Ocurrió un error: {err}')
             return mi_error_500(request)
     else:
-        formulario = ProductoForm(None)
+        formulario = ProductoForm(request=request)
     return render(request, 'productos/crear.html', {"formulario":formulario})
 
 def producto_editar(request, producto_id):
@@ -228,8 +228,8 @@ def producto_editar(request, producto_id):
     if request.method == "POST":
         datosFormulario = request.POST
     
-    producto = helper.obtener_producto(producto_id)
-    formulario = ProductoForm(datosFormulario,
+    producto = helper.obtener_producto(producto_id, request)
+    formulario = ProductoForm(datosFormulario, request=request,
                               initial={
                                'nombre': producto['nombre'],
                                'descripcion': producto['descripcion'],
@@ -238,9 +238,10 @@ def producto_editar(request, producto_id):
                                 'vendedor': producto['vendedor']['id'],
                                 'categorias': [categoria['id'] for categoria in producto['categorias']]
                               }
+                              
                             )
     if request.method == 'POST':
-        formulario = ProductoForm(request.POST)
+        formulario = ProductoForm(request.POST, request=request)
         datos = formulario.data.copy()
         datos['categorias'] = request.POST.getlist('categorias')
           

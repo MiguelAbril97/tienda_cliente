@@ -4,7 +4,7 @@
     <div>
         {% if request.session.token %}
         <p>
-          Nombre Usuario: {{ request.user.username }}
+          Nombre Usuario: {{ request.session }}
         </p>
         <a class="btn btn-danger" href="{% url 'logout' %}">Logout</a>
         {% else %}
