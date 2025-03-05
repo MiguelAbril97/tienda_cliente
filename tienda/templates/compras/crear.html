@@ -1,3 +1,5 @@
+{% extends "principal.html" %}
+{%block contenido%}
 {% load django_bootstrap5 %}
 {% bootstrap_css %}
 
@@ -22,3 +24,5 @@
 
     {% bootstrap_button "Guardar" button_type="submit" button_class="btn-primary" %}
 </form>
+{% endblock %}
+
