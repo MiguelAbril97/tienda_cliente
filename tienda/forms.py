@@ -33,10 +33,25 @@ class BuscarProducto(forms.Form):
         label= 'Categorías',
         required=False,
     )
+    
     buscarVendedor =forms.CharField(
         label="Vendedor",
         required=False,
     ) 
+    
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request")
+        super(BuscarProducto, self).__init__(*args, **kwargs)
+        
+        if(self.request.session['usuario']['rol'] == 3):
+            vendedoresDisponibles = helper.obtener_vendedor(self.request.session['usuario']['id'], self.request)
+            self.fields['buscarVendedor'] =  forms.ChoiceField(
+                choices=vendedoresDisponibles,
+                required=True,
+                initial=vendedoresDisponibles[0],
+                label="Vendedor",
+            )
+
  
 class ProductoForm(forms.Form):
     ESTADOS=[
@@ -111,9 +126,10 @@ class CompraForm(forms.Form):
                                  label="Garantía")
 
     def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request")
         super(CompraForm, self).__init__(*args, **kwargs)
-        compradores_disponibles = helper.obtener_compradores()
-        productos_disponibles = helper.obtener_productos()
+        compradores_disponibles = helper.obtener_comprador(self.request.session['usuario']['id'], self.request)
+        productos_disponibles = helper.obtener_productos(self.request)
         
         self.fields['comprador'] = forms.ChoiceField(
             choices=compradores_disponibles,
@@ -147,12 +163,13 @@ class ValoracionForm(forms.Form):
                                  label="Comentario")
 
     def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request")
         super(ValoracionForm, self).__init__(*args, **kwargs)
-        usuarios_disponibles = helper.obtener_compradores()
-        compras_disponibles = helper.obtener_compras()
+        compradores_disponibles = helper.obtener_comprador(self.request.session['usuario']['id'], self.request)
+        compras_disponibles = helper.obtener_compras(self.request)
         
         self.fields['usuario'] = forms.ChoiceField(
-            choices=usuarios_disponibles,
+            choices=compradores_disponibles,
             required=True,
             widget=forms.Select(),
             label="Usuario"

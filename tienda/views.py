@@ -155,7 +155,7 @@ def producto_buscar_simple(request):
 
 def producto_buscar(request):
     if len(request.GET) > 0:
-        formulario = BuscarProducto(request.GET)
+        formulario = BuscarProducto(request.GET, request=request)
         try:
             headers = crear_cabecera(request)
             response = requests.get(peticion_v1('productos/buscar_avanzada'), 
@@ -181,7 +181,7 @@ def producto_buscar(request):
             print(f'Ocurrió un error: {err}')
             return mi_error_500(request)
     else:
-        formulario = BuscarProducto(None)
+        formulario = BuscarProducto(request=request)
     return render(request, 'productos/buscar.html', {"formulario":formulario})
 
 #CRUD ManyToMany con tabla intermedia
@@ -314,7 +314,7 @@ def producto_eliminar(request, producto_id):
 def compra_crear(request):
     if (request.method == 'POST'):    
         try:
-            formulario = CompraForm(request.POST)
+            formulario = CompraForm(request.POST, request=request)
             headers = crear_cabecera(request)
             datos = formulario.data.copy()
             
@@ -346,7 +346,7 @@ def compra_crear(request):
             print(f'Ocurrió un error: {err}')
             return mi_error_500(request)
     else:
-        formulario = CompraForm(None)
+        formulario = CompraForm(request=request)
     return render(request, 'compras/crear.html', {"formulario":formulario})
 
 def compra_editar(request, compra_id):
@@ -356,8 +356,8 @@ def compra_editar(request, compra_id):
     if request.method == "POST":
         datosFormulario = request.POST
     
-    compra = helper.obtener_compra(compra_id)
-    formulario = CompraForm(datosFormulario,
+    compra = helper.obtener_compra(compra_id, request)
+    formulario = CompraForm(datosFormulario, request=request,
                             initial={
                                 'total': compra['total'],
                                 'garantia': compra['garantia'],
@@ -366,7 +366,7 @@ def compra_editar(request, compra_id):
                             }
                         )
     if request.method == 'POST':
-        formulario = CompraForm(request.POST)
+        formulario = CompraForm(request.POST, request=request)
         datos = request.POST.copy()
         datos['producto'] = request.POST.getlist('producto')
         datos['comprador'] = request.POST.getlist('comprador')
@@ -397,7 +397,7 @@ def compra_actualizar_garantia(request, compra_id):
     if request.method == "POST":
         datosFormulario = request.POST
         
-    compra = helper.obtener_compra(compra_id)
+    compra = helper.obtener_compra(compra_id,request)
     formulario = CompraActualizarGarantiaForm(datosFormulario,
                                                  initial={'garantia': compra['garantia']})
 
@@ -439,7 +439,7 @@ def compra_eliminar(request, compra_id):
 def valoracion_crear(request):
     if(request.method == 'POST'):
         try:
-            formulario = ValoracionForm(request.POST)
+            formulario = ValoracionForm(request.POST, request=request)
             headers = crear_cabecera(request)
             response = requests.post(
                                     peticion_v1('valoraciones/crear'),
@@ -467,7 +467,7 @@ def valoracion_crear(request):
             print(f'Ocurrió un error: {err}')
             return mi_error_500(request)
     else:
-        formulario = ValoracionForm(None)
+        formulario = ValoracionForm(request=request)
     return render(request, 'valoraciones/crear.html', {"formulario":formulario})
         
 
@@ -478,8 +478,8 @@ def valoracion_editar(request, valoracion_id):
     if request.method == "POST":
         datosFormulario = request.POST
 
-    valoracion = helper.obtener_valoracion(valoracion_id)
-    formulario = ValoracionForm(datosFormulario,
+    valoracion = helper.obtener_valoracion(valoracion_id, request)
+    formulario = ValoracionForm(datosFormulario, request=request,
                                 initial={
                                     'puntuacion': valoracion['puntuacion'],
                                     'comentario': valoracion['comentario'],
@@ -489,7 +489,7 @@ def valoracion_editar(request, valoracion_id):
                             )
     
     if request.method == 'POST':
-        formulario = ValoracionForm(request.POST)
+        formulario = ValoracionForm(request.POST, request=request)
         datos = formulario.data.copy()
         response = requests.put(
                                 peticion_v1('valoraciones/editar/'+str(valoracion_id)),
@@ -519,7 +519,7 @@ def valoracion_actualizar_puntuacion(request, valoracion_id):
     if request.method == "POST":
         datosFormulario = request.POST
         
-    valoracion = helper.obtener_valoracion(valoracion_id)
+    valoracion = helper.obtener_valoracion(valoracion_id, request)
     formulario = ValoracionActualizarPuntuacionForm(datosFormulario,
                                                        initial={'puntuacion': valoracion['puntuacion']})
 

@@ -40,8 +40,8 @@ class helper:
             lista_categorias.append((categoria['id'], categoria['nombre']))
         return lista_categorias
 
-    def obtener_vendedores():
-        headers = {'Authorization': 'Bearer ' + env('TOKEN_ACCESO')}
+    def obtener_vendedores(request):
+        headers = views.crear_cabecera(request)
         response = requests.get('http://127.0.0.1:8000/api/v1/vendedores/listar/', headers=headers)
         vendedores = response.json()
 
@@ -50,8 +50,8 @@ class helper:
             lista_vendedores.append((vendedor['id'], vendedor['usuario']['username']))
         return lista_vendedores
 
-    def obtener_compradores():
-        headers = {'Authorization': 'Bearer ' + env('TOKEN_ACCESO')}
+    def obtener_compradores(request):
+        headers = views.crear_cabecera(request)
         response = requests.get('http://127.0.0.1:8000/api/v1/compradores/listar/', headers=headers)
         compradores = response.json()
 
@@ -91,20 +91,28 @@ class helper:
         lista_vendedor.append((vendedores['usuario']['id'],vendedores['usuario']['username']))
         return lista_vendedor
     
+    def obtener_comprador(id,request):
+        headers = views.crear_cabecera(request)
+        response = requests.get(f'http://127.0.0.1:8000/api/v1/compradores/'+str(id)+'/', headers=headers)
+        comprador = response.json()
+        lista_comprador = []
+        lista_comprador.append((comprador['usuario']['id'],comprador['usuario']['username']))
+        return lista_comprador
+    
     def obtener_producto(id, request):
         headers = views.crear_cabecera(request)
         response = requests.get(f'http://127.0.0.1:8000/api/v1/productos/'+str(id)+'/', headers=headers)
         producto = response.json()
         return producto
 
-    def obtener_compra(id):
-        headers = {'Authorization': 'Bearer ' + env('TOKEN_ACCESO')}
+    def obtener_compra(id,request):
+        headers = views.crear_cabecera(request)
         response = requests.get(f'http://127.0.0.1:8000/api/v1/compras/'+str(id)+'/', headers=headers)
         compra = response.json()
         return compra
 
-    def obtener_valoracion(id):
-        headers = {'Authorization': 'Bearer ' + env('TOKEN_ACCESO')}
+    def obtener_valoracion(id, request):
+        headers = views.crear_cabecera(request)
         response = requests.get(f'http://127.0.0.1:8000/api/v1/valoraciones/'+str(id)+'/', headers=headers)
         valoracion = response.json()
         return valoracion
