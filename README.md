@@ -19,6 +19,6 @@ Cliente:
     contraseña: contraseña12
 
 Vendedor:
-    usuario: Jorge_vendedor
-    contraseña: contraseña12
+    usuario: Vendedor_ejemplo
+    contraseña: falsaContra12.
 

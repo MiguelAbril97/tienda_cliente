@@ -1,32 +1,36 @@
-{% load django_bootstrap5 %}
-{% bootstrap_css %}
+{% extends "principal.html" %}
+{%block contenido%}
 
-<form action="{% url 'productos_crear'%}"  method="POST" method = "post" enctype="multipart/form-data">
-    {% csrf_token %}
+    {% load django_bootstrap5 %}
+    {% bootstrap_css %}
 
-    <div class="mb-4">
-        {% bootstrap_field formulario.nombre show_label=True %}
-    </div>
+    <form action="{% url 'productos_crear'%}"  method="POST" method = "post" enctype="multipart/form-data">
+        {% csrf_token %}
 
-    <div class="mb-4">
-        {% bootstrap_field formulario.descripcion show_label=True %}
-    </div>
+        <div class="mb-4">
+            {% bootstrap_field formulario.nombre show_label=True %}
+        </div>
 
-    <div class="mb-4">
-        {% bootstrap_field formulario.precio show_label=True %}
-    </div>
+        <div class="mb-4">
+            {% bootstrap_field formulario.descripcion show_label=True %}
+        </div>
 
-    <div class="mb-4">
-        {% bootstrap_field formulario.estado show_label=True %}
-    </div>
+        <div class="mb-4">
+            {% bootstrap_field formulario.precio show_label=True %}
+        </div>
 
-    <div class="mb-4">
-        {% bootstrap_field formulario.vendedor show_label=True %}
-    </div>
+        <div class="mb-4">
+            {% bootstrap_field formulario.estado show_label=True %}
+        </div>
 
-    <div class="mb-4">
-        {% bootstrap_field formulario.categorias show_label=True %}
-    </div>
+        <div class="mb-4">
+            {% bootstrap_field formulario.vendedor show_label=True %}
+        </div>
 
-    {% bootstrap_button "Guardar" button_type="submit" button_class="btn-primary" %}
-</form>
+        <div class="mb-4">
+            {% bootstrap_field formulario.categorias show_label=True %}
+        </div>
+
+        {% bootstrap_button "Guardar" button_type="submit" button_class="btn-primary" %}
+    </form>
+{% endblock %}

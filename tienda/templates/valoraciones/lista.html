@@ -1,9 +1,5 @@
-<head>
-    {% load django_bootstrap5 %}
-    {% bootstrap_css %}
-    {% load static %}
-</head>
-<body>
+{% extends "principal.html" %}
+{%block contenido%}
     <div class="text-center my-4">
         <h1>Lista de valoraciones</h1>
     </div>
@@ -16,6 +12,7 @@
             {% endfor %}
         </div>
     </div>
+{% endblock %}
 
-</body>
+
 

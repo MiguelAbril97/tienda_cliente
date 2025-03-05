@@ -1,38 +1,41 @@
-{% load django_bootstrap5 %}
-{% bootstrap_css %}
-<form action="{% url 'productos_buscar' %}" method="GET">
-    
-    {% csrf_token %}
+{% extends "principal.html" %}
+{%block contenido%}
+    {% load django_bootstrap5 %}
+    {% bootstrap_css %}
+    <form action="{% url 'productos_buscar' %}" method="GET">
 
-    <div class="mb-4">
-        {% bootstrap_field formulario.buscarNombre show_label=True %}
-    </div>
+        {% csrf_token %}
 
-    <div class="mb-4">
-        {% bootstrap_field formulario.buscarDescripcion show_label=True %}
-    </div>
-
-    <div class="mb-4">
-        {% bootstrap_field formulario.buscarPrecioMax show_label=True %}
-        <div class="invalid-feedback">
-            {% for error in formulario.buscarPrecioMax.errors %}
-                {{ error }}
-            {% endfor %}
+        <div class="mb-4">
+            {% bootstrap_field formulario.buscarNombre show_label=True %}
         </div>
-    </div>
 
-    <div class="mb-4">
-        {% bootstrap_field formulario.buscarEstado show_label=True %}
-    </div>
+        <div class="mb-4">
+            {% bootstrap_field formulario.buscarDescripcion show_label=True %}
+        </div>
 
-    <div class="mb-4">
-        {% bootstrap_field formulario.buscarCategorias show_label=True %}
-    </div>
+        <div class="mb-4">
+            {% bootstrap_field formulario.buscarPrecioMax show_label=True %}
+            <div class="invalid-feedback">
+                {% for error in formulario.buscarPrecioMax.errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        </div>
 
-    <div class="mb-4">
-        {% bootstrap_field formulario.buscarVendedor show_label=True %}
-    </div>
+        <div class="mb-4">
+            {% bootstrap_field formulario.buscarEstado show_label=True %}
+        </div>
 
-    {% bootstrap_button "Buscar" button_type="submit" button_class="btn-primary" %}
+        <div class="mb-4">
+            {% bootstrap_field formulario.buscarCategorias show_label=True %}
+        </div>
 
-</form>
+        <div class="mb-4">
+            {% bootstrap_field formulario.buscarVendedor show_label=True %}
+        </div>
+
+        {% bootstrap_button "Buscar" button_type="submit" button_class="btn-primary" %}
+
+    </form>
+{% endblock %}

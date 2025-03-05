@@ -1,8 +1,9 @@
-<head>
-    {% load django_bootstrap5 %}
-    {% bootstrap_css %}
-    {% load static %}
-</head>
+{% extends "principal.html" %}
+
+{%block contenido%}
+<div class="text-center my-4">
+    <h1>Lista de compras</h1>
+</div>
 <div class="container">
     <div class="row">
         {% for compra in compras %}
@@ -12,3 +13,4 @@
         {% endfor %}
     </div>
 </div>
+{% endblock %}

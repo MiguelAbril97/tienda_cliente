@@ -272,7 +272,7 @@ def producto_actualizar_nombre(request, producto_id):
     if request.method == "POST":
         datosFormulario = request.POST
         
-    producto = helper.obtener_producto(producto_id)
+    producto = helper.obtener_producto(producto_id, request)
     formulario = ProductoActualizarNombreForm(datosFormulario,
                                                   initial={'nombre': producto['nombre']})
         
